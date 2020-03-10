@@ -56,8 +56,8 @@
         </dependency>
         <dependency>
             <groupId>me.saro</groupId>
-            <artifactId>commons</artifactId>
-            <version>4.0.3</version>
+            <artifactId>kit</artifactId>
+            <version>0.0.7</version>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
