@@ -17,7 +17,7 @@ import java.util.function.Predicate;
  * org.apache.commons.net.ftp.FTPClient
  * com.jcraft.jsch.JSch
  */
-public interface FTP extends Closeable {
+public interface Ftp extends Closeable {
     
     /**
      * open ftp
@@ -33,8 +33,8 @@ public interface FTP extends Closeable {
      * FTP Object
      * @throws IOException
      */
-    public static FTP openFTP(InetAddress host, int port, String user, String pass) throws IOException {
-        return new FTPS(host, port, user, pass, false);
+    static Ftp ftp(InetAddress host, int port, String user, String pass) throws IOException {
+        return new Ftps(host, port, user, pass, false);
     }
     
     /**
@@ -51,8 +51,8 @@ public interface FTP extends Closeable {
      * FTP Object
      * @throws IOException
      */
-    public static FTP openFTP(String host, int port, String user, String pass) throws IOException {
-        return new FTPS(InetAddress.getByName(host), port, user, pass, false);
+    static Ftp ftp(String host, int port, String user, String pass) throws IOException {
+        return new Ftps(InetAddress.getByName(host), port, user, pass, false);
     }
     
     /**
@@ -69,8 +69,8 @@ public interface FTP extends Closeable {
      * FTP Object
      * @throws IOException
      */
-    public static FTP openFTPS(InetAddress host, int port, String user, String pass) throws IOException {
-        return new FTPS(host, port, user, pass, true);
+    static Ftp ftps(InetAddress host, int port, String user, String pass) throws IOException {
+        return new Ftps(host, port, user, pass, true);
     }
     
     /**
@@ -87,8 +87,8 @@ public interface FTP extends Closeable {
      * FTP Object
      * @throws IOException
      */
-    public static FTP openFTPS(String host, int port, String user, String pass) throws IOException {
-        return new FTPS(InetAddress.getByName(host), port, user, pass, true);
+    static Ftp ftps(String host, int port, String user, String pass) throws IOException {
+        return new Ftps(InetAddress.getByName(host), port, user, pass, true);
     }
     
     /**
@@ -105,28 +105,29 @@ public interface FTP extends Closeable {
      * FTP Object
      * @throws IOException
      */
-    public static FTP openSFTP(String host, int port, String user, String pass) throws IOException {
-        return new SFTP(host, port, user, pass);
+    static Ftp sftp(String host, int port, String user, String pass) throws IOException {
+        return new Sftp(host, port, user, pass);
     }
     
     /**
      * change directory<br>
      * same method path(), cd()
+     * @param pathname
      * @return
      * @throws IOException 
      */
-    default public boolean cd(String pathname) throws IOException {
+    default boolean cd(String pathname) throws IOException {
         return path(pathname);
     }
     
     /**
      * move path<br>
      * same method path(), cd()
-     * @param path
+     * @param pathname
      * @return
      * @throws IOException
      */
-    public boolean path(String pathname) throws IOException;
+    boolean path(String pathname) throws IOException;
 
     /**
      * get now path<br>
@@ -134,7 +135,7 @@ public interface FTP extends Closeable {
      * @return
      * @throws IOException
      */
-    public String path() throws IOException;
+    String path() throws IOException;
     
     /**
      * print working directory<br>
@@ -142,7 +143,7 @@ public interface FTP extends Closeable {
      * @return
      * @throws IOException
      */
-    default public String pwd() throws IOException {
+    default String pwd() throws IOException {
         return path();
     }
     
@@ -153,14 +154,14 @@ public interface FTP extends Closeable {
      * @return
      * @throws IOException
      */
-    public List<String> listFiles(Predicate<String> filter) throws IOException;
+    List<String> listFiles(Predicate<String> filter) throws IOException;
     
     /**
      * get file list in now path
      * @return
      * @throws IOException
      */
-    public List<String> listFiles() throws IOException;
+    List<String> listFiles() throws IOException;
     
     /**
      * get directory list in now path
@@ -169,14 +170,14 @@ public interface FTP extends Closeable {
      * @return
      * @throws IOException
      */
-    public List<String> listDirectories(Predicate<String> filter) throws IOException;
+    List<String> listDirectories(Predicate<String> filter) throws IOException;
     
     /**
      * get directory list in now path
      * @return
      * @throws IOException
      */
-    public List<String> listDirectories() throws IOException;
+    List<String> listDirectories() throws IOException;
     
     /**
      * has file in path
@@ -184,7 +185,7 @@ public interface FTP extends Closeable {
      * @return
      * @throws IOException
      */
-    public boolean hasFile(String filename) throws IOException;
+    boolean hasFile(String filename) throws IOException;
     
     /**
      * has directory in path
@@ -192,15 +193,15 @@ public interface FTP extends Closeable {
      * @return
      * @throws IOException
      */
-    public boolean hasDirectory(String directoryname) throws IOException;
+    boolean hasDirectory(String directoryname) throws IOException;
     
     /**
      * remove file
-     * @param file
+     * @param filename
      * @return
      * @throws IOException
      */
-    public boolean delete(String filename) throws IOException;
+    boolean delete(String filename) throws IOException;
     
     /**
      * send file
@@ -209,7 +210,7 @@ public interface FTP extends Closeable {
      * @return
      * @throws IOException
      */
-    public boolean send(String saveFilename, File localFile) throws IOException;
+    boolean send(String saveFilename, File localFile) throws IOException;
     
     /**
      * send file
@@ -217,18 +218,18 @@ public interface FTP extends Closeable {
      * @return
      * @throws IOException
      */
-    default public boolean send(File localFile) throws IOException {
+    default boolean send(File localFile) throws IOException {
         return send(localFile.getName(), localFile);
     }
 
     /**
      * recv file
-     * @param serverFileName
+     * @param remoteFilename
      * @param localFile
      * @return
      * @throws IOException
      */
-    public boolean recv(String remoteFilename, File localFile) throws IOException;
+    boolean recv(String remoteFilename, File localFile) throws IOException;
     
     /**
      * recv file list
@@ -236,7 +237,7 @@ public interface FTP extends Closeable {
      * @param localDirectory
      * @return
      */
-    default public void recv(List<String> remoteFilenameList, File localDirectory) throws IOException {
+    default void recv(List<String> remoteFilenameList, File localDirectory) throws IOException {
         if (!localDirectory.isDirectory()) {
             throw new IOException("["+localDirectory.getAbsolutePath()+"] is not Directory");
         }
@@ -253,10 +254,10 @@ public interface FTP extends Closeable {
      * @return
      * @throws IOException
      */
-    public boolean mkdir(String createDirectoryName) throws IOException;
+    boolean mkdir(String createDirectoryName) throws IOException;
     
     /**
      * close
      */
-    public void close();
+    void close();
 }

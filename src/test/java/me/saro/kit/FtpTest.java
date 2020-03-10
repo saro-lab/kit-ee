@@ -1,13 +1,13 @@
 package me.saro.kit;
 
-import me.saro.commons.__old.bytes.ftp.FTP;
+import me.saro.kit.ftp.Ftp;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class FTPTest {
+public class FtpTest {
 
     @Test
     public void test() throws Exception {
@@ -31,7 +31,7 @@ public class FTPTest {
             fos.write("the test file".getBytes());
         }
         
-        try (FTP ftp = FTP.openFTP(host, port, user, pass)) {
+        try (Ftp ftp = Ftp.ftp(host, port, user, pass)) {
             
             System.out.println("==================================");
             System.out.println("## now path");

@@ -18,11 +18,11 @@ import java.util.stream.Stream;
 /**
  * FTP, FTPS
  */
-public class FTPS implements FTP {
+public class Ftps implements Ftp {
 
     final @Getter FTPClient ftp;
     
-    public FTPS(InetAddress host, int port, String user, String pass, boolean isFTPS) throws IOException {
+    public Ftps(InetAddress host, int port, String user, String pass, boolean isFTPS) throws IOException {
         if (isFTPS) {
             ftp = new FTPSClient(true);
         } else {

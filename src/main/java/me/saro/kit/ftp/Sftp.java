@@ -13,13 +13,15 @@ import java.util.function.Predicate;
 
 /**
  * SFTP
+ * it is not FTPS
+ * SFTP != FTPS
  */
-public class SFTP implements FTP {
+public class Sftp implements Ftp {
 
     final @Getter ChannelSftp sftp;
     final Session session;
     
-    public SFTP(String host, int port, String user, String pass) throws IOException {
+    public Sftp(String host, int port, String user, String pass) throws IOException {
         try {
             session = new JSch().getSession(user, host, port);
             session.setPassword(pass);
