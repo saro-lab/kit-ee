@@ -37,7 +37,9 @@ public class Ftps implements Ftp {
             }
             ftp.enterLocalPassiveMode();
             ftp.setUseEPSVwithIPv4(false);
-            ftp.login(user, pass);
+            if (!ftp.login(user, pass)) {
+                throw new RuntimeException("login fail");
+            }
             ftp.setControlKeepAliveReplyTimeout(60000);
             ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
         } catch (IOException e) {
