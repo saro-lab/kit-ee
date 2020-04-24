@@ -1,4 +1,4 @@
-package me.saro.kit.ftp;
+package me.saro.kit.ee.ftp;
 
 import lombok.Getter;
 import org.apache.commons.net.ftp.FTPClient;

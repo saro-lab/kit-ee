@@ -1,6 +1,6 @@
-package me.saro.kit;
+package me.saro.kit.ee;
 
-import me.saro.kit.ftp.Ftp;
+import me.saro.kit.ee.ftp.Ftp;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;

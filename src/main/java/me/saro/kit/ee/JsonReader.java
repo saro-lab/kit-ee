@@ -1,4 +1,4 @@
-package me.saro.kit;
+package me.saro.kit.ee;
 
 import java.util.List;
 import java.util.Map;

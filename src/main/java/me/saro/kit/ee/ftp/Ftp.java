@@ -1,4 +1,4 @@
-package me.saro.kit.ftp;
+package me.saro.kit.ee.ftp;
 
 import java.io.Closeable;
 import java.io.File;
