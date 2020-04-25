@@ -1,5 +1,9 @@
 package me.saro.kit.ee;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,24 +16,22 @@ import java.util.stream.Collectors;
  */
 public class JsonReader {
 
+    final public static ObjectMapper MAPPER = new ObjectMapper();
+
     /**
      * create json reader
-     * @param data
+     * @param json
+     * @throws JsonProcessingException
      */
-    public JsonReader(Object data) {
-        this.data = data;
-    }
-    
-    /**
-     * create json reader
-     * @param data
-     */
-    public JsonReader(String json) {
+    public JsonReader(String json) throws JsonProcessingException {
         int arrayIndex = json.indexOf('[');
         int objectIndex = json.indexOf('{');
-        Object data = (arrayIndex > -1 && (arrayIndex < objectIndex || objectIndex == -1))
-                ? Converter.toMapListByJsonArray(json)
-                : Converter.toMapByJsonObject(json);
+        this.data = arrayIndex > -1 && arrayIndex < objectIndex
+                ? MAPPER.readValue(json, new TypeReference<List<Map<String, Object>>>() {})
+                : MAPPER.readValue(json, new TypeReference<Map<String, Object>>() {});
+    }
+
+    private JsonReader(Object data) {
         this.data = data;
     }
 
@@ -190,7 +192,11 @@ public class JsonReader {
     public String toString() {
         String rv;
         synchronized (lock) {
-            rv = Converter.toJson(data);
+            try {
+                rv = MAPPER.writeValueAsString(data);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
         return rv;
     }
