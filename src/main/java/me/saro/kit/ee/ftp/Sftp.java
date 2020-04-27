@@ -3,7 +3,6 @@ package me.saro.kit.ee.ftp;
 import com.jcraft.jsch.*;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.ChannelSftp.LsEntrySelector;
-import lombok.Getter;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ import java.util.function.Predicate;
  */
 public class Sftp implements Ftp {
 
-    final @Getter ChannelSftp sftp;
+    final ChannelSftp sftp;
     final Session session;
     
     public Sftp(String host, int port, String user, String pass) throws IOException {
@@ -102,9 +101,9 @@ public class Sftp implements Ftp {
     }
     
     @Override
-    public boolean hasDirectory(String directoryname) throws IOException {
+    public boolean hasDirectory(String directoryName) throws IOException {
         try {
-            return Optional.ofNullable(sftp.lstat(path() + "/" + directoryname))
+            return Optional.ofNullable(sftp.lstat(path() + "/" + directoryName))
                     .filter(e -> e.isDir()).isPresent();
         } catch (SftpException e) {
             if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
@@ -176,5 +175,12 @@ public class Sftp implements Ftp {
             session.disconnect();
         } catch (Exception e) {
         }
+    }
+
+    public ChannelSftp getChannelSftp() {
+        return sftp;
+    }
+    public Session getSession() {
+        return session;
     }
 }

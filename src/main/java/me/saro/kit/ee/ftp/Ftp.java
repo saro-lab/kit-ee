@@ -189,11 +189,11 @@ public interface Ftp extends Closeable {
     
     /**
      * has directory in path
-     * @param directoryname
+     * @param directoryName
      * @return
      * @throws IOException
      */
-    boolean hasDirectory(String directoryname) throws IOException;
+    boolean hasDirectory(String directoryName) throws IOException;
     
     /**
      * remove file

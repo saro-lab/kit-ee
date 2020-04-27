@@ -1,9 +1,9 @@
 package me.saro.kit.ee.ftp;
 
-import lombok.Getter;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPSClient;
+import sun.net.ftp.FtpClient;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,7 +20,7 @@ import java.util.stream.Stream;
  */
 public class Ftps implements Ftp {
 
-    final @Getter FTPClient ftp;
+    final FTPClient ftp;
     
     public Ftps(InetAddress host, int port, String user, String pass, boolean isFTPS) throws IOException {
         if (isFTPS) {
@@ -111,8 +111,8 @@ public class Ftps implements Ftp {
     }
     
     @Override
-    public boolean hasDirectory(String directoryname) throws IOException {
-        FTPFile ff = ftp.mlistFile(path() + "/" + directoryname);
+    public boolean hasDirectory(String directoryName) throws IOException {
+        FTPFile ff = ftp.mlistFile(path() + "/" + directoryName);
         return ff != null && ff.isDirectory();
     }
 
@@ -179,5 +179,9 @@ public class Ftps implements Ftp {
             ftp.disconnect();
         } catch (IOException e) {
         }
+    }
+
+    public FTPClient getFTPClient() {
+        return ftp;
     }
 }
