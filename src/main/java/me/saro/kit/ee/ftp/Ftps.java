@@ -3,7 +3,6 @@ package me.saro.kit.ee.ftp;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPSClient;
-import sun.net.ftp.FtpClient;
 
 import java.io.File;
 import java.io.FileInputStream;
