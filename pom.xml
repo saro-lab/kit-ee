@@ -39,25 +39,20 @@
         <java.version>8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <jackson.version>2.10.0</jackson.version>
-        <junit.version>5.4.2</junit.version>
+        <jackson.version>2.10.3</jackson.version>
+        <junit.version>5.6.2</junit.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>4.1.0</version>
+            <version>4.1.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>4.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>me.saro</groupId>
-            <artifactId>kit</artifactId>
-            <version>0.0.7</version>
+            <version>4.1.2</version>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
@@ -65,15 +60,14 @@
             <version>0.1.55</version>
         </dependency>
         <dependency>
+            <groupId>me.saro</groupId>
+            <artifactId>kit</artifactId>
+            <version>0.0.7</version>
+        </dependency>
+        <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
             <version>3.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.8</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
