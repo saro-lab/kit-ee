@@ -21,7 +21,7 @@ import java.util.Set;
 public class BasicExcel implements Excel {
     
     final private Workbook book;
-    @Getter final private boolean bulk;
+    final private boolean bulk;
     
     //private int sheetIndex = -1;
     private int rowIndex = - 1;
