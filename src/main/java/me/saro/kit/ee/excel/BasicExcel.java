@@ -34,7 +34,12 @@ public class BasicExcel implements Excel {
         this.bulk = book.getClass().getName().equals(SXSSFWorkbook.class.getName());
         moveSheet(0);
     }
-    
+
+    @Override
+    public boolean isBulk() {
+        return bulk;
+    }
+
     @Override
     public Sheet getPoiSheet() {
         return sheet;
@@ -132,12 +137,9 @@ public class BasicExcel implements Excel {
      */
     @Override
     public void close() throws IOException {
-        try (OutputStream bos = new NullOutputStream()){
-            book.write(bos);
-            bos.flush();
-        } catch (IOException e) {
-        }
-        try {
+        try (OutputStream os = new OutputStream() {@Override public void write(int b) { }}) {
+            book.write(os);
+            os.flush();
             book.close();
         } catch (IOException e) {
         }
