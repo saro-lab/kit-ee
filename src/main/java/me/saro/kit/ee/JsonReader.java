@@ -26,7 +26,7 @@ public class JsonReader {
     public JsonReader(String json) throws JsonProcessingException {
         int arrayIndex = json.indexOf('[');
         int objectIndex = json.indexOf('{');
-        this.data = arrayIndex > -1 && arrayIndex < objectIndex
+        this.data = arrayIndex > -1 && (arrayIndex < objectIndex || objectIndex == -1)
                 ? MAPPER.readValue(json, new TypeReference<List<Map<String, Object>>>() {})
                 : MAPPER.readValue(json, new TypeReference<Map<String, Object>>() {});
     }
