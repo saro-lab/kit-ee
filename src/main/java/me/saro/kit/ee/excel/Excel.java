@@ -1,5 +1,6 @@
 package me.saro.kit.ee.excel;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.saro.kit.functions.ThrowableFunction;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -90,7 +91,7 @@ public interface Excel extends Closeable {
             ExcelRow row = getRow(rc[0]);
             for (T t : list) {
                 ExcelCell cell = row.getCell(rc[1]);
-                Map<String, Object> map = Converter.toMapByClass(t);
+                Map<String, Object> map = MAPPER.convertValue(t, new TypeReference<Map<String, Object>>() {});
                 for (String name : columnNames) {
                     cell = cell.set(map.get(name)).getNextCell();
                 }
@@ -108,7 +109,7 @@ public interface Excel extends Closeable {
             
             for (T t : list) {
                 ExcelCell cell = getCell(ri, ci++);
-                Map<String, Object> map = Converter.toMapByClass(t);
+                Map<String, Object> map = MAPPER.convertValue(t, new TypeReference<Map<String, Object>>() {});
                 for (String name : columnNames) {
                     cell = cell.set(map.get(name)).getNextRowCell();
                 }
