@@ -1,5 +1,7 @@
 package me.saro.kit.ee.excel;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import me.saro.kit.functions.ThrowableFunction;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -20,6 +22,8 @@ import java.util.Map;
  * @since       3.0
  */
 public interface Excel extends Closeable {
+
+    static ObjectMapper MAPPER = new ObjectMapper();
     
     static Excel createBulkExcel() {
         return new BasicExcel(new SXSSFWorkbook(100));
