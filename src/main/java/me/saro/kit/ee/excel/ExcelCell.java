@@ -110,7 +110,6 @@ public class ExcelCell {
     /**
      * toDouble by cell
      * @param cell
-     * @param defaultValue
      * @return
      */
     public static double toDouble(Cell cell) {
@@ -123,11 +122,11 @@ public class ExcelCell {
                     return cell.getNumericCellValue();
                 case FORMULA:
                     if ((tmp = cell.getCellFormula()) != null && !tmp.isEmpty()) {
-                        return Utils.parseDouble(tmp);
+                        return Double.parseDouble(tmp);
                     }
                 case STRING:
                     if ((tmp = cell.getStringCellValue()) != null && !tmp.isEmpty()) {
-                        return Utils.parseDouble(tmp);
+                        return Double.parseDouble(tmp);
                     }
                 case _NONE: case ERROR: case BLANK: default:
             }
