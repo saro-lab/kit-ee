@@ -1,18 +1,15 @@
 package me.saro.kit.ee;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import me.saro.commons.excel.Excel;
-import me.saro.commons.excel.ExcelCell;
-import me.saro.commons.excel.ExcelRow;
+import me.saro.kit.ee.excel.Excel;
+import me.saro.kit.ee.excel.ExcelCell;
+import me.saro.kit.ee.excel.ExcelRow;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class ExcelTest {
@@ -55,8 +52,8 @@ public class ExcelTest {
         try (Excel excel = Excel.create()) {
             
             List<Map<String, Object>> list = new ArrayList<>();
-            list.add(Converter.toMap("a", 1, "b", "AA"));
-            list.add(Converter.toMap("a", 2, "b", "BB"));
+            list.add(toMap("a", 1, "b", "AA"));
+            list.add(toMap("a", 2, "b", "BB"));
             
             excel.writeTable("B2", Arrays.asList("a", "b"), list);
             
@@ -78,8 +75,8 @@ public class ExcelTest {
         try (Excel excel = Excel.create()) {
             
             List<Map<String, Object>> list = new ArrayList<>();
-            list.add(Converter.toMap("a", "1", "b", "AA"));
-            list.add(Converter.toMap("a", "2", "b", "BB"));
+            list.add(toMap("a", "1", "b", "AA"));
+            list.add(toMap("a", "2", "b", "BB"));
             
             excel.writeTable("B2", Arrays.asList("a", "b"), list);
             
@@ -101,8 +98,8 @@ public class ExcelTest {
         try (Excel excel = Excel.create()) {
             
             List<Map<String, Object>> list = new ArrayList<>();
-            list.add(Converter.toMap("a", 1, "b", "AA"));
-            list.add(Converter.toMap("a", 2, "b", "BB"));
+            list.add(toMap("a", 1, "b", "AA"));
+            list.add(toMap("a", 2, "b", "BB"));
             
             excel.writeTable("B2", Arrays.asList("a", "b"), list);
             
@@ -119,8 +116,8 @@ public class ExcelTest {
         try (Excel excel = Excel.create()) {
             
             List<Map<String, Object>> list = new ArrayList<>();
-            list.add(Converter.toMap("a", 1, "b", "AA"));
-            list.add(Converter.toMap("a", 2, "b", "BB"));
+            list.add(toMap("a", 1, "b", "AA"));
+            list.add(toMap("a", 2, "b", "BB"));
             
             excel.writePivotTable("B2", Arrays.asList("a", "b"), list);
             
@@ -157,11 +154,31 @@ public class ExcelTest {
     @Test
     public void writeTable() throws IOException {
         try (Excel excel = Excel.create()) {
-            
-            @Data @AllArgsConstructor
+
             class TestObject {
                 int a;
                 String b;
+
+                public TestObject(int a, String b) {
+                    this.a = a;
+                    this.b = b;
+                }
+
+                public int getA() {
+                    return a;
+                }
+
+                public void setA(int a) {
+                    this.a = a;
+                }
+
+                public String getB() {
+                    return b;
+                }
+
+                public void setB(String b) {
+                    this.b = b;
+                }
             }
             
             List<TestObject> list = new ArrayList<>();
@@ -181,11 +198,31 @@ public class ExcelTest {
     @Test
     public void writePivotTable() throws IOException {
         try (Excel excel = Excel.create()) {
-            
-            @Data @AllArgsConstructor
+
             class TestObject {
                 int a;
                 String b;
+
+                public TestObject(int a, String b) {
+                    this.a = a;
+                    this.b = b;
+                }
+
+                public int getA() {
+                    return a;
+                }
+
+                public void setA(int a) {
+                    this.a = a;
+                }
+
+                public String getB() {
+                    return b;
+                }
+
+                public void setB(String b) {
+                    this.b = b;
+                }
             }
             
             List<TestObject> list = new ArrayList<>();
@@ -201,7 +238,7 @@ public class ExcelTest {
             assertEquals(excel.getCell("C3").getStringValue(), "BBB");
         }
     }
-    
+
     //@Test
     public void file() throws Exception {
         try (Excel excel = Excel.open(new File("C:\\Users\\SARO\\Desktop\\aaa.xlsx"))) {
@@ -219,5 +256,15 @@ public class ExcelTest {
             System.out.println(excel.getCell("A5").getIntegerStringValue(-1));
             System.out.println(excel.getCell("A6").getIntegerStringValue(-1));
         }
+    }
+
+
+    public static <K, V> Map<K, V> toMap(Object... vals) {
+        Map<K, V> map = new HashMap<>();
+        for (int i = 0 ; i < vals.length ; ) {
+            map.put((K)vals[i], (V)vals[i + 1]);
+            i += 2;
+        }
+        return map;
     }
 }
