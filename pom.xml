@@ -4,7 +4,7 @@
     <groupId>me.saro</groupId>
     <artifactId>kit-ee</artifactId>
     <description>SARO KIT Enterprise Edition for java</description>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.0.7.1</version>
     <packaging>jar</packaging>
 
     <name>SARO KIT Enterprise Edition</name>
@@ -69,21 +69,6 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
