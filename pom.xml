@@ -4,7 +4,7 @@
     <groupId>me.saro</groupId>
     <artifactId>kit-ee</artifactId>
     <description>SARO KIT Enterprise Edition for java</description>
-    <version>0.0.7.1</version>
+    <version>0.0.7.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>SARO KIT Enterprise Edition</name>
