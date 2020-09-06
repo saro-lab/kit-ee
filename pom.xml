@@ -4,7 +4,7 @@
     <groupId>me.saro</groupId>
     <artifactId>kit-ee</artifactId>
     <description>SARO KIT Enterprise Edition for java</description>
-    <version>0.0.7.2</version>
+    <version>0.0.7.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>SARO KIT Enterprise Edition</name>
@@ -92,7 +92,7 @@
         <connection>scm:git:git://github.com/saro-lab/kit.git</connection>
         <developerConnection>scm:git:git@github.com:saro-lab/kit.git</developerConnection>
         <url>https://github.com/saro-lab/kit</url>
-        <tag>kit-ee-0.0.7.2</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <profiles>
