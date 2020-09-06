@@ -30,6 +30,7 @@ public class Ftps implements Ftp {
                 fs.execPBSZ(0);
                 fs.execPROT("P");
             }
+            ftp.setStrictReplyParsing(false);
             ftp.enterLocalPassiveMode();
             ftp.setUseEPSVwithIPv4(false);
             if (!ftp.login(user, pass)) {
@@ -98,17 +99,25 @@ public class Ftps implements Ftp {
     public String path() throws IOException {
         return ftp.printWorkingDirectory();
     }
-    
+
     @Override
     public boolean hasFile(String filename) throws IOException {
-        FTPFile ff = ftp.mlistFile(path() + "/" + filename);
-        return ff != null && ff.isFile();
+        FTPFile ff = ftp.mlistFile(filename);
+        if (ff != null) {
+            return ff.isFile();
+        } else {
+            return listFiles().parallelStream().anyMatch(e -> filename.equals(e));
+        }
     }
-    
+
     @Override
     public boolean hasDirectory(String directoryName) throws IOException {
         FTPFile ff = ftp.mlistFile(path() + "/" + directoryName);
-        return ff != null && ff.isDirectory();
+        if (ff != null) {
+            return ff.isDirectory();
+        } else {
+            return listDirectories().parallelStream().anyMatch(e -> directoryName.equals(e));
+        }
     }
 
     @Override
