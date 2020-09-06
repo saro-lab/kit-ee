@@ -22,11 +22,7 @@ public class Ftps implements Ftp {
     final FTPClient ftp;
     
     public Ftps(InetAddress host, int port, String user, String pass, boolean isFTPS) throws IOException {
-        if (isFTPS) {
-            ftp = new FTPSClient(true);
-        } else {
-            ftp = new FTPClient();
-        }
+        ftp = isFTPS ? new FTPSClient(true) : new FTPClient();
         try {
             ftp.connect(host, port);
             if (isFTPS) {
@@ -42,11 +38,11 @@ public class Ftps implements Ftp {
             ftp.setControlKeepAliveReplyTimeout(60000);
             ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
         } catch (IOException e) {
-           try {
-               ftp.disconnect();
-           } catch (Exception e1) {
-           }
-           throw e;
+            try {
+                ftp.disconnect();
+            } catch (Exception e1) {
+            }
+            throw e;
         }
     }
     

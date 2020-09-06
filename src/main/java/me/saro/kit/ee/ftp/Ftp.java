@@ -18,77 +18,53 @@ import java.util.function.Predicate;
  * com.jcraft.jsch.JSch
  */
 public interface Ftp extends Closeable {
-    
+
     /**
-     * open ftp
+     *
      * @param host
-     * ip or domain
      * @param port
-     * port (ftp basic port 21)
      * @param user
-     * username
      * @param pass
-     * password
      * @return
-     * FTP Object
-     * @throws IOException
-     */
-    static Ftp ftp(InetAddress host, int port, String user, String pass) throws IOException {
-        return new Ftps(host, port, user, pass, false);
-    }
-    
-    /**
-     * open ftp
-     * @param host
-     * ip or domain
-     * @param port
-     * port (ftp basic port 21)
-     * @param user
-     * username
-     * @param pass
-     * password
-     * @return
-     * FTP Object
      * @throws IOException
      */
     static Ftp ftp(String host, int port, String user, String pass) throws IOException {
         return new Ftps(InetAddress.getByName(host), port, user, pass, false);
     }
-    
+
     /**
-     * open ftps
+     * anonymous
      * @param host
-     * ip or domain
      * @param port
-     * port (ftps basic port 990)
-     * @param user
-     * username
-     * @param pass
-     * password
      * @return
-     * FTP Object
      * @throws IOException
      */
-    static Ftp ftps(InetAddress host, int port, String user, String pass) throws IOException {
-        return new Ftps(host, port, user, pass, true);
+    static Ftp ftp(String host, int port) throws IOException {
+        return new Ftps(InetAddress.getByName(host), port, "anonymous", "", false);
     }
-    
+
     /**
-     * open ftps
+     *
      * @param host
-     * ip or domain
      * @param port
-     * port (ftps basic port 990)
      * @param user
-     * username
      * @param pass
-     * password
      * @return
-     * FTP Object
      * @throws IOException
      */
     static Ftp ftps(String host, int port, String user, String pass) throws IOException {
         return new Ftps(InetAddress.getByName(host), port, user, pass, true);
+    }
+
+    /**
+     * anonymous
+     * @param host
+     * @param port
+     * @return
+     * @throws IOException
+     */
+    static Ftp ftps(String host, int port) throws IOException {
+        return new Ftps(InetAddress.getByName(host), port, "anonymous", "", true);
     }
     
     /**
@@ -99,6 +75,7 @@ public interface Ftp extends Closeable {
      * port (sftp basic port 22)
      * @param user
      * username
+     * null is anonymous
      * @param pass
      * password
      * @return
@@ -107,6 +84,17 @@ public interface Ftp extends Closeable {
      */
     static Ftp sftp(String host, int port, String user, String pass) throws IOException {
         return new Sftp(host, port, user, pass);
+    }
+
+    /**
+     * anonymous
+     * @param host
+     * @param port
+     * @return
+     * @throws IOException
+     */
+    static Ftp sftp(String host, int port) throws IOException {
+        return new Sftp(host, port, "anonymous", "");
     }
     
     /**
