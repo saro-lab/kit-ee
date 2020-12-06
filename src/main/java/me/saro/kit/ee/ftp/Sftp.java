@@ -19,15 +19,10 @@ public class Sftp implements Ftp {
 
     final ChannelSftp sftp;
     final Session session;
-    
-    public Sftp(String host, int port, String user, String pass) throws IOException {
+
+    public Sftp(String host, int port, String user, SftpOpener opener) throws IOException {
         try {
-            session = new JSch().getSession(user, host, port);
-            session.setPassword(pass);
-            session.setConfig("StrictHostKeyChecking", "no");
-            session.connect();
-            sftp = (ChannelSftp) session.openChannel("sftp");
-            sftp.connect();
+            sftp = opener.open((session = new JSch().getSession(user, host, port)));
         } catch (JSchException e) {
             throw new IOException(e);
         }
@@ -182,5 +177,9 @@ public class Sftp implements Ftp {
     }
     public Session getSession() {
         return session;
+    }
+
+    public static interface SftpOpener {
+        ChannelSftp open(final Session session) throws IOException, JSchException;
     }
 }

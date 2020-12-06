@@ -1,9 +1,12 @@
 package me.saro.kit.ee.ftp;
 
+import com.jcraft.jsch.ChannelSftp;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPSClient;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -12,89 +15,79 @@ import java.util.function.Predicate;
  * <br>
  * simple ftp class
  * @author		PARK Yong Seo
- * @since		0.2
  * @see
  * org.apache.commons.net.ftp.FTPClient
  * com.jcraft.jsch.JSch
  */
 public interface Ftp extends Closeable {
 
-    /**
-     *
-     * @param host
-     * @param port
-     * @param user
-     * @param pass
-     * @return
-     * @throws IOException
-     */
+    static Ftp ftp(Ftps.FtpOpener opener) throws IOException {
+        return new Ftps(opener);
+    }
+
     static Ftp ftp(String host, int port, String user, String pass) throws IOException {
-        return new Ftps(InetAddress.getByName(host), port, user, pass, false);
+        return ftp(() -> {
+            FTPClient ftp = new FTPClient();
+            ftp.setStrictReplyParsing(false);
+            ftp.connect(host, port);
+            ftp.enterLocalPassiveMode();
+            ftp.setUseEPSVwithIPv4(false);
+            if (!ftp.login(user, pass)) {
+                throw new IOException("login fail");
+            }
+            ftp.setControlKeepAliveReplyTimeout(60000);
+            ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+            return ftp;
+        });
     }
 
-    /**
-     * anonymous
-     * @param host
-     * @param port
-     * @return
-     * @throws IOException
-     */
     static Ftp ftp(String host, int port) throws IOException {
-        return new Ftps(InetAddress.getByName(host), port, "anonymous", "", false);
+        return ftp(host, port, "anonymous", "");
     }
 
-    /**
-     *
-     * @param host
-     * @param port
-     * @param user
-     * @param pass
-     * @return
-     * @throws IOException
-     */
-    static Ftp ftps(String host, int port, String user, String pass) throws IOException {
-        return new Ftps(InetAddress.getByName(host), port, user, pass, true);
+    static Ftp ftps(Ftps.FtpsOpener opener) throws IOException {
+        return new Ftps(opener);
     }
 
-    /**
-     * anonymous
-     * @param host
-     * @param port
-     * @return
-     * @throws IOException
-     */
-    static Ftp ftps(String host, int port) throws IOException {
-        return new Ftps(InetAddress.getByName(host), port, "anonymous", "", true);
+    static Ftp ftps(boolean isImplicit, String host, int port, String user, String pass) throws IOException {
+        return ftps(() -> {
+            FTPSClient ftps = new FTPSClient(isImplicit);
+            ftps.setStrictReplyParsing(false);
+            ftps.connect(host, port);
+            ftps.execPBSZ(0);
+            ftps.execPROT("P");
+            ftps.enterLocalPassiveMode();
+            ftps.setUseEPSVwithIPv4(false);
+            if (!ftps.login(user, pass)) {
+                throw new IOException("login fail");
+            }
+            ftps.setControlKeepAliveReplyTimeout(60000);
+            ftps.setFileType(FTPClient.BINARY_FILE_TYPE);
+            return ftps;
+        });
     }
-    
-    /**
-     * open sftp
-     * @param host
-     * ip or domain
-     * @param port
-     * port (sftp basic port 22)
-     * @param user
-     * username
-     * null is anonymous
-     * @param pass
-     * password
-     * @return
-     * FTP Object
-     * @throws IOException
-     */
+
+    static Ftp ftps(boolean isImplicit, String host, int port) throws IOException {
+        return ftps(isImplicit, host, port, "anonymous", "");
+    }
+
+    static Ftp sftp(String host, int port, String user, Sftp.SftpOpener opener) throws IOException {
+        return new Sftp(host, port, user, opener);
+    }
+
     static Ftp sftp(String host, int port, String user, String pass) throws IOException {
-        return new Sftp(host, port, user, pass);
+        return sftp(host, port, user, session -> {
+            session.setPassword(pass);
+            session.setConfig("StrictHostKeyChecking", "no");
+            session.connect();
+            ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
+            sftp.connect();
+            return sftp;
+        });
     }
 
-    /**
-     * anonymous
-     * @param host
-     * @param port
-     * @return
-     * @throws IOException
-     */
     static Ftp sftp(String host, int port) throws IOException {
-        return new Sftp(host, port, "anonymous", "");
+        return sftp(host, port, "anonymous", "");
     }
     
     /**

@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -20,31 +19,27 @@ import java.util.stream.Stream;
 public class Ftps implements Ftp {
 
     final FTPClient ftp;
-    
-    public Ftps(InetAddress host, int port, String user, String pass, boolean isFTPS) throws IOException {
-        ftp = isFTPS ? new FTPSClient(true) : new FTPClient();
+
+    public Ftps(FtpsOpener opener) throws IOException {
+        FTPClient ftp = null;
         try {
-            ftp.connect(host, port);
-            if (isFTPS) {
-                FTPSClient fs = (FTPSClient)ftp;
-                fs.execPBSZ(0);
-                fs.execPROT("P");
-            }
-            ftp.setStrictReplyParsing(false);
-            ftp.enterLocalPassiveMode();
-            ftp.setUseEPSVwithIPv4(false);
-            if (!ftp.login(user, pass)) {
-                throw new RuntimeException("login fail");
-            }
-            ftp.setControlKeepAliveReplyTimeout(60000);
-            ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+            ftp = opener.open();
         } catch (IOException e) {
-            try {
-                ftp.disconnect();
-            } catch (Exception e1) {
-            }
+            try { if (ftp != null) { ftp.disconnect(); } } catch (Exception e1) { }
             throw e;
         }
+        this.ftp = ftp;
+    }
+
+    public Ftps(FtpOpener opener) throws IOException {
+        FTPClient ftp = null;
+        try {
+            ftp = opener.open();
+        } catch (IOException e) {
+            try { if (ftp != null) { ftp.disconnect(); } } catch (Exception e1) { }
+            throw e;
+        }
+        this.ftp = ftp;
     }
     
     /**
@@ -187,5 +182,13 @@ public class Ftps implements Ftp {
 
     public FTPClient getFTPClient() {
         return ftp;
+    }
+
+    public static interface FtpOpener {
+        FTPClient open() throws IOException;
+    }
+
+    public static interface FtpsOpener {
+        FTPSClient open() throws IOException;
     }
 }
