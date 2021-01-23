@@ -1,8 +1,7 @@
 package me.saro.kit.ee.excel;
 
 import me.saro.kit.Files;
-import me.saro.kit.functions.ThrowableConsumer;
-import me.saro.kit.functions.ThrowableFunction;
+import me.saro.kit.ThrowableConsumer;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.*;
