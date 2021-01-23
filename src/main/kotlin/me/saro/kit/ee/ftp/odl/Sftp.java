@@ -1,8 +1,9 @@
-package me.saro.kit.ee.ftp;
+package me.saro.kit.ee.ftp.odl;
 
 import com.jcraft.jsch.*;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.ChannelSftp.LsEntrySelector;
+import me.saro.kit.ee.ftp.Ftp;
 
 import java.io.*;
 import java.util.ArrayList;
