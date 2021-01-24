@@ -17,78 +17,61 @@ import java.util.function.Predicate
  */
 class Sftp: Ftp {
 
-    private var session: Session
-    private var channelSftp: ChannelSftp
-
-    internal constructor(session: Session, channelSftp: ChannelSftp) {
-        this.session = session
-        this.channelSftp = channelSftp
-    }
+    private val builder: Builder
+    private val session: Session
+    private val channelSftp: ChannelSftp
 
     @Throws(IOException::class)
-    override fun path(pathname: String): Boolean {
+    internal constructor(builder: Builder) {
         try {
-            channelSftp!!.cd(pathname)
-        } catch (e: SftpException) {
-            return false
-        }
-        return true
-    }
-
-    @Throws(IOException::class)
-    override fun path(): String {
-        return try {
-            channelSftp!!.pwd()
-        } catch (e: SftpException) {
-            throw RuntimeException(e)
-        }
-    }
-
-    @Throws(IOException::class)
-    private fun list(filter: Predicate<LsEntry>): List<String> {
-        return try {
-            val list: MutableList<String> = ArrayList()
-            channelSftp!!.ls(path()) { e: LsEntry ->
-                if (filter.test(e)) {
-                    list.add(e.filename)
-                }
-                LsEntrySelector.CONTINUE
-            }
-            list
-        } catch (e: SftpException) {
+            this.builder = builder
+            this.session = JSch().getSession(builder.username, builder.host, builder.port)
+            session.setPassword(builder.password)
+            builder.cmd.values.forEach { it(session) }
+            session.connect()
+            this.channelSftp = (session.openChannel("sftp") as ChannelSftp).apply { this.connect() }
+        } catch (e: Exception) {
             throw IOException(e)
         }
     }
 
     @Throws(IOException::class)
-    override fun listFiles(filter: Predicate<String>): List<String> {
-        return list { e: LsEntry -> !e.attrs.isDir && filter.test(e.filename) }
+    override fun path(pathname: String): Boolean = tryReturn { channelSftp.cd(pathname) }
+
+    @Throws(IOException::class)
+    override fun path(): String = tryOut { channelSftp.pwd() }
+
+    @Throws(IOException::class)
+    private fun list(filter: Predicate<LsEntry>): List<String> = tryOut {
+        ArrayList<String>().apply {
+            channelSftp.ls(path()) { ls: LsEntry ->
+                if (filter.test(ls)) { this.add(ls.filename) }
+                LsEntrySelector.CONTINUE
+            }
+        }
     }
 
     @Throws(IOException::class)
-    override fun listFiles(): List<String> {
-        return list { e: LsEntry -> !e.attrs.isDir }
-    }
+    override fun listFiles(): List<String> = list { e: LsEntry -> !e.attrs.isDir }
 
     @Throws(IOException::class)
-    override fun listDirectories(filter: Predicate<String>): List<String> {
-        return list { e: LsEntry -> e.attrs.isDir && !e.filename.matches("[\\.]{1,2}") && filter.test(e.filename) }
-    }
+    override fun listFiles(filter: Predicate<String>): List<String> =
+        list { e: LsEntry -> !e.attrs.isDir && filter.test(e.filename) }
 
     @Throws(IOException::class)
-    override fun listDirectories(): List<String> {
-        return list { e: LsEntry -> e.attrs.isDir && !e.filename.matches("[\\.]{1,2}") }
-    }
+    override fun listDirectories(filter: Predicate<String>): List<String> =
+        list { e: LsEntry -> e.attrs.isDir && !e.filename.matches("[\\.]{1,2}".toRegex()) && filter.test(e.filename) }
+
+    @Throws(IOException::class)
+    override fun listDirectories(): List<String> =
+        list { e: LsEntry -> e.attrs.isDir && !e.filename.matches("[\\.]{1,2}".toRegex()) }
 
     @Throws(IOException::class)
     override fun hasFile(filename: String): Boolean {
         return try {
-            Optional.ofNullable(channelSftp!!.lstat(path() + "/" + filename))
-                .filter { e: SftpATTRS -> !e.isDir }.isPresent
+            Optional.ofNullable(channelSftp.lstat(path() + "/" + filename)).filter { e: SftpATTRS -> !e.isDir }.isPresent
         } catch (e: SftpException) {
-            if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
-                return false
-            }
+            if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) { return false }
             throw IOException(e)
         }
     }
@@ -96,104 +79,74 @@ class Sftp: Ftp {
     @Throws(IOException::class)
     override fun hasDirectory(directoryName: String): Boolean {
         return try {
-            Optional.ofNullable(channelSftp!!.lstat(path() + "/" + directoryName))
-                .filter { e: SftpATTRS -> e.isDir }.isPresent
+            Optional.ofNullable(channelSftp.lstat(path() + "/" + directoryName)).filter { e: SftpATTRS -> e.isDir }.isPresent
         } catch (e: SftpException) {
-            if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
-                return false
-            }
+            if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) { return false }
             throw IOException(e)
         }
     }
 
     @Throws(IOException::class)
-    override fun delete(filename: String): Boolean {
-        return try {
-            if (hasFile(filename)) {
-                channelSftp!!.rm(filename)
-                return true
-            } else if (hasDirectory(filename)) {
-                channelSftp!!.rmdir(filename)
-                return true
-            }
-            false
-        } catch (e: Exception) {
-            throw IOException(e)
+    override fun delete(filename: String): Boolean = tryOut {
+        when {
+            hasFile(filename) -> { channelSftp.rm(filename); true }
+            hasDirectory(filename) -> { channelSftp.rmdir(filename); true }
+            else -> false
         }
     }
 
     @Throws(IOException::class)
-    override fun send(saveFilename: String, localFile: File): Boolean {
-        try {
-            FileInputStream(localFile).use { input -> channelSftp!!.put(input, saveFilename) }
-        } catch (e: Exception) {
-            throw RuntimeException(e)
-        }
-        return true
+    override fun send(saveFilename: String, localFile: File): Boolean = tryOut {
+        FileInputStream(localFile).use { input -> channelSftp.put(input, saveFilename) }; true
     }
 
     @Throws(IOException::class)
-    override fun recv(remoteFilename: String, localFile: File): Boolean {
-        if (!hasFile(remoteFilename)) {
-            return false
-        }
-        if (localFile.exists()) {
-            localFile.delete()
-        }
-        try {
-            FileOutputStream(localFile).use { fos ->
-                channelSftp!![remoteFilename, fos]
-                return true
-            }
-        } catch (e: Exception) {
-            throw IOException(e)
-        }
+    override fun recv(remoteFilename: String, localFile: File): Boolean = tryOut {
+        if (!hasFile(remoteFilename)) { return@tryOut false }
+        if (localFile.exists()) { localFile.delete() }
+        FileOutputStream(localFile).use { fos -> channelSftp[remoteFilename, fos] }
+        return@tryOut true
     }
 
     @Throws(IOException::class)
-    override fun mkdir(createDirectoryName: String): Boolean {
-        try {
-            channelSftp!!.mkdir(createDirectoryName)
-        } catch (e: SftpException) {
-            return false
-        }
-        return true
-    }
+    override fun mkdir(createDirectoryName: String): Boolean = tryReturn { channelSftp.mkdir(createDirectoryName) }
 
     override fun close() {
-        try {
-            channelSftp!!.disconnect()
-        } catch (e: Exception) {
-        }
-        try {
-            session!!.disconnect()
-        } catch (e: Exception) {
-        }
+        try { channelSftp.disconnect() } catch (e: Exception) { }
+        try { session.disconnect() } catch (e: Exception) { }
     }
 
-    companion object class SFTPBuilder {
-        private val open: (JSch) -> Session
-        private val cmd = mutableMapOf<String, (Session) -> Unit>()
+    private fun tryReturn(fn: () -> Unit): Boolean = try { fn(); true } catch (e: SftpException) { false }
 
-        internal constructor(host: String, port: Int, username: String = "anonymous", password: ByteArray = ByteArray(0)) {
-            open = { it.getSession(username, host, port) }
-            cmd["open"] = { e -> e.setPassword(password) }
-        }
+    @Throws(IOException::class)
+    private fun <T> tryOut(fn: () -> T): T = try { fn() } catch (e: Exception) { throw IOException(e) }
 
-        fun custom(exec: (Session) -> Unit) =
-            this.apply { cmd["custom"] = exec }
+    companion object class Builder internal constructor(
+        internal val host: String,
+        internal val port: Int,
+        internal var username: String = "",
+        internal var password: ByteArray = byteArrayOf()
+    ) {
+        internal val cmd = mutableMapOf<String, (Session) -> Unit>()
 
-        fun strictHostKeyChecking(value: String) =
-            this.apply { cmd["strictHostKeyChecking"] = { it.setConfig("StrictHostKeyChecking", "no") } }
-
+        // default setting
         init {
             strictHostKeyChecking("no")
         }
 
-        fun open(): Ftp {
-            val session = JSch().run { open(this) }
-            cmd.values.forEach { it(session) }
-            return Sftp(session, (session.openChannel("sftp") as ChannelSftp).apply { this.connect() })
-        }
+        fun options(exec: (Session) -> Unit) = this.apply { cmd["options"] = exec }
+
+        fun strictHostKeyChecking(value: String) =
+            this.apply { cmd["options"] = { it.setConfig("StrictHostKeyChecking", value) } }
+
+        @Throws(IOException::class)
+        fun userAnonymous(): Builder = this.apply { this.username = "anonymous" }
+
+        fun user(username: String, password: String): Builder = user(username, password.toByteArray())
+
+        fun user(username: String, password: ByteArray): Builder = this.apply { this.username = username; this.password = password }
+
+        @Throws(IOException::class)
+        fun open(): Ftp = Sftp(this)
     }
 }

@@ -19,14 +19,14 @@ interface Ftp : Closeable {
 
     companion object {
 //        @Throws(IOException::class)
-//        fun ftp(opener: FtpOpener?): FTP? {
+//        fun ftp(opener: FtpOpener): FTP {
 //            return Ftps(opener)
 //        }
 //
 //        @JvmStatic
 //        @JvmOverloads
 //        @Throws(IOException::class)
-//        fun ftp(host: String, port: Int, user: String = "anonymous", pass: String = ""): FTP? {
+//        fun ftp(host: String, port: Int, user: String = "anonymous", pass: String = ""): FTP {
 //            return ftp {
 //                val ftp = FTPClient()
 //                ftp.isStrictReplyParsing = false
@@ -43,14 +43,14 @@ interface Ftp : Closeable {
 //        }
 //
 //        @Throws(IOException::class)
-//        fun ftps(opener: FtpsOpener?): FTP? {
+//        fun ftps(opener: FtpsOpener): FTP {
 //            return Ftps(opener)
 //        }
 //
 //        @JvmStatic
 //        @JvmOverloads
 //        @Throws(IOException::class)
-//        fun ftps(isImplicit: Boolean, host: String, port: Int, user: String = "anonymous", pass: String = ""): FTP? {
+//        fun ftps(isImplicit: Boolean, host: String, port: Int, user: String = "anonymous", pass: String = ""): FTP {
 //            return ftps {
 //                val ftps = FTPSClient(isImplicit)
 //                ftps.isStrictReplyParsing = false
@@ -69,14 +69,14 @@ interface Ftp : Closeable {
 //        }
 //
 //        @Throws(IOException::class)
-//        fun sftp(host: String, port: Int, user: String, opener: SFTP.SftpOpener?): FTP? {
+//        fun sftp(host: String, port: Int, user: String, opener: SFTP.SftpOpener): FTP {
 //            return SFTP(host, port, user, opener)
 //        }
 //
 //        @JvmStatic
 //        @JvmOverloads
 //        @Throws(IOException::class)
-//        fun sftp(host: String, port: Int, user: String = "anonymous", pass: String = ""): FTP? {
+//        fun sftp(host: String, port: Int, user: String = "anonymous", pass: String = ""): FTP {
 //            return sftp(host, port, user, SFTP.SftpOpener { session: Session ->
 //                session.setPassword(pass)
 //                session.setConfig("StrictHostKeyChecking", "no")
@@ -87,14 +87,12 @@ interface Ftp : Closeable {
 //            })
 //        }
 
-        fun sftpAnonymous(host: String, port: Int) =
-            Sftp.SFTPBuilder(host, port)
-
+        @JvmStatic
         fun sftp(host: String, port: Int, username: String, password: String) =
-            Sftp.SFTPBuilder(host, port, username, password.toByteArray())
+            Sftp.Builder(host, port).user(username, password)
 
-        fun sftp(host: String, port: Int, username: String, password: ByteArray) =
-            Sftp.SFTPBuilder(host, port, username, password)
+        @JvmStatic
+        fun sftp(host: String, port: Int) = Sftp.Builder(host, port)
     }
 
     /**
@@ -147,7 +145,7 @@ interface Ftp : Closeable {
      * @throws IOException
      */
     @Throws(IOException::class)
-    fun listFiles(filter: Predicate<String>?): List<String>?
+    fun listFiles(filter: Predicate<String>): List<String>
 
     /**
      * get file list in now path
@@ -155,7 +153,7 @@ interface Ftp : Closeable {
      * @throws IOException
      */
     @Throws(IOException::class)
-    fun listFiles(): List<String>?
+    fun listFiles(): List<String>
 
     /**
      * get directory list in now path
@@ -165,7 +163,7 @@ interface Ftp : Closeable {
      * @throws IOException
      */
     @Throws(IOException::class)
-    fun listDirectories(filter: Predicate<String>?): List<String>?
+    fun listDirectories(filter: Predicate<String>): List<String>
 
     /**
      * get directory list in now path
@@ -173,7 +171,7 @@ interface Ftp : Closeable {
      * @throws IOException
      */
     @Throws(IOException::class)
-    fun listDirectories(): List<String>?
+    fun listDirectories(): List<String>
 
     /**
      * has file in path
@@ -210,7 +208,7 @@ interface Ftp : Closeable {
      * @throws IOException
      */
     @Throws(IOException::class)
-    fun send(saveFilename: String, localFile: File?): Boolean
+    fun send(saveFilename: String, localFile: File): Boolean
 
     /**
      * send file
@@ -231,7 +229,7 @@ interface Ftp : Closeable {
      * @throws IOException
      */
     @Throws(IOException::class)
-    fun recv(remoteFilename: String, localFile: File?): Boolean
+    fun recv(remoteFilename: String, localFile: File): Boolean
 
     /**
      * recv file list
