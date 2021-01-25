@@ -59,7 +59,7 @@ dependencies {
 
 	// lib
 	val poi = "5.0.0";
-	implementation("me.saro:kit:0.1.5")
+	api("me.saro:kit:0.1.5")
 	implementation("com.jcraft:jsch:0.1.55")
 	implementation("commons-net:commons-net:3.7.2")
 	implementation("org.apache.poi:poi:${poi}")
