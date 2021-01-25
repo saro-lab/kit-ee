@@ -15,53 +15,57 @@ public class FtpTest {
 
     @Test
     public void test() throws Exception {
-        // ftp
+        System.out.println("+++++++ FTP +++++++");
         ftp();
-        // ftps (explicit mode)
+
+        System.out.println("+++++++ FTPS (explicit mode) +++++++");
         ftpsExplicitMode();
-        // ftps (implicit mode)
+
+        System.out.println("+++++++ FTPS (implicit mode) +++++++");
         ftpsImplicitMode();
-        // sftp
+
+        System.out.println("+++++++ S-FTP +++++++");
         sftp();
     }
 
     public void ftp() throws IOException {
         try (Ftp ftp = Ftp.ftp("test.rebex.net", 21, "demo", "password").open()) {
             System.out.println("ftp opened!!");
+            System.out.println("pwd: " + ftp.pwd());
+            ftp.listFiles().forEach( it -> System.out.println("file: " + it) );
             assert(true);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("ftp error!!");
         }
     }
 
     public void ftpsExplicitMode() throws IOException {
         try (Ftp ftp = Ftp.ftps(false, "test.rebex.net", 21, "demo", "password").open()) {
             System.out.println("ftps (explicit mode) opened!!");
+            System.out.println("pwd: " + ftp.pwd());
+            ftp.listFiles().forEach( it -> System.out.println("file: " + it) );
             assert(true);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("ftps (explicit mode) error!!");
         }
     }
 
     public void ftpsImplicitMode() throws IOException {
-        try (Ftp ftp = Ftp.ftps(true, "test.rebex.net", 990, "demo", "password").open()) {
+        try (
+                Ftp ftp = Ftp
+                        .ftps(true, "test.rebex.net", 990, "demo", "password")
+                        .encoding("UTF-8")
+                        .open()
+        ) {
             System.out.println("ftps (implicit mode) opened!!");
+            System.out.println("pwd: " + ftp.pwd());
+            ftp.listFiles().forEach( it -> System.out.println("file: " + it) );
             assert(true);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("ftps (implicit mode) error!!");
         }
     }
 
     public void sftp() throws IOException {
         try (Ftp ftp = Ftp.sftp("test.rebex.net", 22, "demo", "password").open()) {
             System.out.println("sftp opened!!");
+            System.out.println("pwd: " + ftp.pwd());
+            ftp.listFiles().forEach( it -> System.out.println("file: " + it) );
             assert(true);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("sftp error!!");
         }
     }
 }

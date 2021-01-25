@@ -25,9 +25,11 @@ class Sftp : Ftp {
     internal constructor(builder: Builder) {
         try {
             this.builder = builder
-            this.session = JSch().getSession(builder.username, builder.host, builder.port)
+            val jSch = JSch()
+            builder.beforeSession.forEach { it(jSch) }
+            this.session = jSch.getSession(builder.username, builder.host, builder.port)
             session.setPassword(builder.password)
-            builder.cmd.values.forEach { it(session) }
+            builder.beforeConnect.forEach { it(session) }
             session.connect()
             this.channelSftp = (session.openChannel("sftp") as ChannelSftp).apply { this.connect() }
         } catch (e: Exception) {
@@ -127,17 +129,19 @@ class Sftp : Ftp {
         internal var username: String = "",
         internal var password: ByteArray = byteArrayOf()
     ) {
-        internal val cmd = mutableMapOf<String, (Session) -> Unit>()
+        internal val beforeSession = ArrayList<(JSch) -> Unit>()
+        internal val beforeConnect = ArrayList<(Session) -> Unit>()
 
         // default setting
         init {
             strictHostKeyChecking("no")
         }
 
-        fun options(exec: (Session) -> Unit) = this.apply { cmd["options"] = exec }
-
         fun strictHostKeyChecking(value: String) =
-            this.apply { cmd["options"] = { it.setConfig("StrictHostKeyChecking", value) } }
+            beforeConnect { it.setConfig("StrictHostKeyChecking", value) }
+
+        fun beforeSession(exec: (JSch) -> Unit) = this.apply { beforeSession.add(exec) }
+        fun beforeConnect(exec: (Session) -> Unit) = this.apply { beforeConnect.add(exec) }
 
         @Throws(IOException::class)
         fun userAnonymous(): Builder = this.apply { this.username = "anonymous" }

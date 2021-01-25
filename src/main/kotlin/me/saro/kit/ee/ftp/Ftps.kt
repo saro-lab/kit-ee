@@ -27,7 +27,7 @@ class Ftps : Ftp {
             this.ftp = builder.ftpClient
             this.secure = builder.secure
             // before connection
-            builder.cmd.forEach { it(ftp) }
+            builder.beforeConnection.forEach { it(ftp) }
             // connecting
             ftp.connect(builder.host, builder.port)
             // after connected
@@ -38,15 +38,21 @@ class Ftps : Ftp {
             }
             ftp.enterLocalPassiveMode()
             ftp.isUseEPSVwithIPv4 = false
+            ftp.controlKeepAliveReplyTimeout = 60000
+            builder.beforeLogin.forEach { it(ftp) }
             if (!ftp.login(builder.username, builder.password)) {
                 throw IOException("login fail")
             }
-            ftp.controlKeepAliveReplyTimeout = 60000
             ftp.setFileType(FTPClient.BINARY_FILE_TYPE)
         } catch (e: Exception) {
             throw IOException(e)
         }
     }
+
+    /**
+     * get raw ftp client
+     */
+    val ftpClient: FTPClient get() = ftp
 
     /**
      * BINARY FILE MODE<br></br>
@@ -150,19 +156,23 @@ class Ftps : Ftp {
         internal var username: String = "",
         internal var password: String = "",
     ) {
-        internal val cmd = ArrayList<(FTPClient) -> Unit>()
+        internal val beforeConnection = ArrayList<(FTPClient) -> Unit>()
+        internal val beforeLogin = ArrayList<(FTPClient) -> Unit>()
 
         // default setting
         init {
             strictReplyParsing(false)
         }
 
-        fun strictReplyParsing(value: Boolean) = custom { it.isStrictReplyParsing = value }
+        fun strictReplyParsing(value: Boolean) = beforeConnection { it.isStrictReplyParsing = value }
 
-        fun encoding(charset: String) = custom { it.controlEncoding = charset }
+        fun encoding(charset: String) = beforeConnection { it.controlEncoding = charset }
 
         /** this function will execute before connection */
-        fun custom(fn: (FTPClient) -> Unit) = this.apply { cmd.add(fn) }
+        fun beforeConnection(fn: (FTPClient) -> Unit) = this.apply { beforeConnection.add(fn) }
+
+        /** this function will execute before login */
+        fun beforeLogin(fn: (FTPClient) -> Unit) = this.apply { beforeLogin.add(fn) }
 
         @Throws(IOException::class)
         fun userAnonymous(): Builder = this.apply { this.username = "anonymous" }
