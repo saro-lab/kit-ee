@@ -26,13 +26,13 @@
 <dependency>
   <groupId>me.saro</groupId>
   <artifactId>kit-ee</artifactId>
-  <version>0.1.5</version>
+  <version>0.1.5.1</version>
 </dependency>
 ```
 
 ## Gradle
 ```
-compile 'me.saro:kit-ee:0.1.5'
+compile 'me.saro:kit-ee:0.1.5.1'
 ```
 
 ---
