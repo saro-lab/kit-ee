@@ -15,7 +15,7 @@ import java.util.function.Predicate
  * it is not FTPS
  * SFTP != FTPS
  */
-class Sftp: Ftp {
+class Sftp : Ftp {
 
     private val builder: Builder
     private val session: Session

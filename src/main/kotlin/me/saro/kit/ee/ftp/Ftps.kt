@@ -1,194 +1,175 @@
-//package me.saro.kit.ee.ftp;
-//
-//import org.apache.commons.net.ftp.FTPClient;
-//import org.apache.commons.net.ftp.FTPFile;
-//import org.apache.commons.net.ftp.FTPSClient;
-//
-//import java.io.File;
-//import java.io.FileInputStream;
-//import java.io.FileOutputStream;
-//import java.io.IOException;
-//import java.util.List;
-//import java.util.function.Predicate;
-//import java.util.stream.Collectors;
-//import java.util.stream.Stream;
-//
-///**
-// * FTP, FTPS
-// */
-//public class Ftps implements Ftp {
-//
-//    final FTPClient ftp;
-//
-//    public Ftps(FtpsOpener opener) throws IOException {
-//        FTPClient ftp = null;
-//        try {
-//            ftp = opener.open();
-//        } catch (IOException e) {
-//            try { if (ftp != null) { ftp.disconnect(); } } catch (Exception e1) { }
-//            throw e;
-//        }
-//        this.ftp = ftp;
-//    }
-//
-//    public Ftps(FtpOpener opener) throws IOException {
-//        FTPClient ftp = null;
-//        try {
-//            ftp = opener.open();
-//        } catch (IOException e) {
-//            try { if (ftp != null) { ftp.disconnect(); } } catch (Exception e1) { }
-//            throw e;
-//        }
-//        this.ftp = ftp;
-//    }
-//
-//    /**
-//     * BINARY FILE MODE<br>
-//     * default : BINARY FILE MODE
-//     * @throws IOException
-//     */
-//    public void enterBinaryFileMode() throws IOException {
-//        ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
-//    }
-//
-//    /**
-//     * ASCII FILE MODE<br>
-//     * default : BINARY FILE MODE
-//     * @throws IOException
-//     */
-//    public void enterAsciiFileMode() throws IOException {
-//        ftp.setFileType(FTPClient.ASCII_FILE_TYPE);
-//    }
-//
-//    /**
-//     * on passive mode<br>
-//     * default value : passive mode
-//     */
-//    public void enterLocalPassiveMode() {
-//        ftp.enterLocalPassiveMode();
-//    }
-//
-//    /**
-//     * on active mode<br>
-//     * default value : passive mode
-//     */
-//    public void enterLocalActiveMode() {
-//        ftp.enterLocalActiveMode();
-//    }
-//
-//    /**
-//     * user Extended Passive Mode with IPv4<br>
-//     * default false
-//     * @param selected
-//     */
-//    public void setUseEPSVwithIPv4(boolean selected) {
-//        ftp.setUseEPSVwithIPv4(selected);
-//    }
-//
-//    @Override
-//    public boolean path(String pathname) throws IOException {
-//        return ftp.changeWorkingDirectory(pathname);
-//    }
-//
-//    @Override
-//    public String path() throws IOException {
-//        return ftp.printWorkingDirectory();
-//    }
-//
-//    @Override
-//    public boolean hasFile(String filename) throws IOException {
-//        FTPFile ff = ftp.mlistFile(filename);
-//        if (ff != null) {
-//            return ff.isFile();
-//        } else {
-//            return listFiles().parallelStream().anyMatch(e -> filename.equals(e));
-//        }
-//    }
-//
-//    @Override
-//    public boolean hasDirectory(String directoryName) throws IOException {
-//        FTPFile ff = ftp.mlistFile(path() + "/" + directoryName);
-//        if (ff != null) {
-//            return ff.isDirectory();
-//        } else {
-//            return listDirectories().parallelStream().anyMatch(e -> directoryName.equals(e));
-//        }
-//    }
-//
-//    @Override
-//    public List<String> listFiles(Predicate<String> filter) throws IOException {
-//        return Stream.of(ftp.listFiles()).filter(e -> e.isFile()).map(e -> e.getName()).filter(filter).collect(Collectors.toList());
-//    }
-//
-//    @Override
-//    public List<String> listFiles() throws IOException {
-//        return Stream.of(ftp.listFiles()).filter(e -> e.isFile()).map(e -> e.getName()).collect(Collectors.toList());
-//    }
-//
-//    @Override
-//    public List<String> listDirectories(Predicate<String> filter) throws IOException {
-//        return Stream.of(ftp.listFiles()).filter(e -> e.isDirectory()).map(e -> e.getName()).filter(filter).collect(Collectors.toList());
-//    }
-//
-//    @Override
-//    public List<String> listDirectories() throws IOException {
-//        return Stream.of(ftp.listFiles()).filter(e -> e.isDirectory()).map(e -> e.getName()).collect(Collectors.toList());
-//    }
-//
-//    @Override
-//    public boolean delete(String filename) throws IOException {
-//        if (hasFile(filename)) {
-//            return ftp.deleteFile(filename);
-//        } else if (hasDirectory(filename)) {
-//            return ftp.removeDirectory(filename);
-//        }
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean send(String saveFilename, File localFile) throws IOException {
-//        try (FileInputStream fis = new FileInputStream(localFile)) {
-//            return ftp.storeFile(saveFilename, fis);
-//        }
-//    }
-//
-//    @Override
-//    public boolean recv(String remoteFilename, File localFile) throws IOException {
-//        if (hasFile(remoteFilename)) {
-//            if (localFile.exists()) {
-//                localFile.delete();
-//            }
-//            try (FileOutputStream fos = new FileOutputStream(localFile)) {
-//                return ftp.retrieveFile(remoteFilename, fos);
-//            }
-//        } else {
-//            return false;
-//        }
-//    }
-//
-//    @Override
-//    public boolean mkdir(String createDirectoryName) throws IOException {
-//        ftp.mkd(createDirectoryName);
-//        return true;
-//    }
-//
-//    @Override
-//    public void close() {
-//        try {
-//            ftp.disconnect();
-//        } catch (IOException e) {
-//        }
-//    }
-//
-//    public FTPClient getFTPClient() {
-//        return ftp;
-//    }
-//
-//    public static interface FtpOpener {
-//        FTPClient open() throws IOException;
-//    }
-//
-//    public static interface FtpsOpener {
-//        FTPSClient open() throws IOException;
-//    }
-//}
+package me.saro.kit.ee.ftp
+
+import org.apache.commons.net.ftp.FTPClient
+import org.apache.commons.net.ftp.FTPFile
+import org.apache.commons.net.ftp.FTPSClient
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.function.Predicate
+import java.util.stream.Collectors
+import java.util.stream.Stream
+
+/**
+ * FTP, FTPS
+ */
+class Ftps : Ftp {
+    private val ftp: FTPClient
+    private val builder: Builder
+    private val secure: Boolean
+
+    @Throws(IOException::class)
+    internal constructor(builder: Builder) {
+        try {
+            // define
+            this.builder = builder
+            this.ftp = builder.ftpClient
+            this.secure = builder.secure
+            // before connection
+            builder.cmd.forEach { it(ftp) }
+            // connecting
+            ftp.connect(builder.host, builder.port)
+            // after connected
+            if (secure) {
+                val ftps = ftp as FTPSClient
+                ftps.execPBSZ(0)
+                ftps.execPROT("P")
+            }
+            ftp.enterLocalPassiveMode()
+            ftp.isUseEPSVwithIPv4 = false
+            if (!ftp.login(builder.username, builder.password)) {
+                throw IOException("login fail")
+            }
+            ftp.controlKeepAliveReplyTimeout = 60000
+            ftp.setFileType(FTPClient.BINARY_FILE_TYPE)
+        } catch (e: Exception) {
+            throw IOException(e)
+        }
+    }
+
+    /**
+     * BINARY FILE MODE<br></br>
+     * default : BINARY FILE MODE
+     * @throws IOException
+     */
+    @Throws(IOException::class)
+    fun enterBinaryFileMode() = ftp.setFileType(FTPClient.BINARY_FILE_TYPE)
+
+    /**
+     * ASCII FILE MODE<br></br>
+     * default : BINARY FILE MODE
+     * @throws IOException
+     */
+    @Throws(IOException::class)
+    fun enterAsciiFileMode() = ftp.setFileType(FTPClient.ASCII_FILE_TYPE)
+
+    /**
+     * on passive mode<br></br>
+     * default value : passive mode
+     */
+    fun enterLocalPassiveMode() = ftp.enterLocalPassiveMode()
+
+    /**
+     * on active mode<br></br>
+     * default value : passive mode
+     */
+    fun enterLocalActiveMode() = ftp.enterLocalActiveMode()
+
+    /**
+     * user Extended Passive Mode with IPv4<br></br>
+     * default false
+     * @param selected
+     */
+    fun setUseEPSVwithIPv4(selected: Boolean) { ftp.isUseEPSVwithIPv4 = selected }
+
+    @Throws(IOException::class)
+    override fun path(pathname: String): Boolean = ftp.changeWorkingDirectory(pathname)
+
+    @Throws(IOException::class)
+    override fun path(): String = ftp.printWorkingDirectory()
+
+    @Throws(IOException::class)
+    override fun hasFile(filename: String): Boolean =
+        ftp.mlistFile(filename)?.isFile ?: listFiles().parallelStream().anyMatch { e: String -> filename == e }
+
+    @Throws(IOException::class)
+    override fun hasDirectory(directoryName: String): Boolean =
+        ftp.mlistFile(path() + "/" + directoryName)?.isDirectory
+            ?: listDirectories().parallelStream().anyMatch { e: String -> directoryName == e }
+
+    @Throws(IOException::class)
+    override fun listFiles(filter: Predicate<String>): List<String> =
+        Stream.of(*ftp.listFiles()).filter { e: FTPFile -> e.isFile }
+            .map { e: FTPFile -> e.name }.filter(filter).collect(Collectors.toList())
+
+    @Throws(IOException::class)
+    override fun listFiles(): List<String> =
+        Stream.of(*ftp.listFiles()).filter { e: FTPFile -> e.isFile }
+            .map { e: FTPFile -> e.name }.collect(Collectors.toList())
+
+    @Throws(IOException::class)
+    override fun listDirectories(filter: Predicate<String>): List<String> =
+        Stream.of(*ftp.listFiles()).filter { e: FTPFile -> e.isDirectory }
+            .map { e: FTPFile -> e.name }.filter(filter).collect(Collectors.toList())
+
+    @Throws(IOException::class)
+    override fun listDirectories(): List<String> =
+        Stream.of(*ftp.listFiles()).filter { e: FTPFile -> e.isDirectory }
+            .map { e: FTPFile -> e.name }.collect(Collectors.toList())
+
+    @Throws(IOException::class)
+    override fun delete(filename: String): Boolean =
+        when {
+            hasFile(filename) -> ftp.deleteFile(filename)
+            hasDirectory(filename) -> ftp.removeDirectory(filename)
+            else -> false
+        }
+
+    @Throws(IOException::class)
+    override fun send(saveFilename: String, localFile: File): Boolean =
+        FileInputStream(localFile).use { fis -> return ftp.storeFile(saveFilename, fis) }
+
+    @Throws(IOException::class)
+    override fun recv(remoteFilename: String, localFile: File): Boolean =
+        if (hasFile(remoteFilename)) {
+            if (localFile.exists()) { localFile.delete() }
+            FileOutputStream(localFile).use { fos -> return ftp.retrieveFile(remoteFilename, fos) }
+        } else false
+
+    @Throws(IOException::class)
+    override fun mkdir(createDirectoryName: String): Boolean { ftp.mkd(createDirectoryName); return true }
+
+    override fun close(): Unit = try { ftp.disconnect() } catch (e: IOException) { }
+
+    companion object class Builder internal constructor(
+        internal val secure: Boolean,
+        internal val ftpClient: FTPClient,
+        internal val host: String,
+        internal val port: Int,
+        internal var username: String = "",
+        internal var password: String = "",
+    ) {
+        internal val cmd = ArrayList<(FTPClient) -> Unit>()
+
+        // default setting
+        init {
+            strictReplyParsing(false)
+        }
+
+        fun strictReplyParsing(value: Boolean) = custom { it.isStrictReplyParsing = value }
+
+        fun encoding(charset: String) = custom { it.controlEncoding = charset }
+
+        /** this function will execute before connection */
+        fun custom(fn: (FTPClient) -> Unit) = this.apply { cmd.add(fn) }
+
+        @Throws(IOException::class)
+        fun userAnonymous(): Builder = this.apply { this.username = "anonymous" }
+
+        fun user(username: String, password: String): Builder = this.apply { this.username = username; this.password = password }
+
+        @Throws(IOException::class)
+        fun open(): Ftp = Ftps(this)
+    }
+}
