@@ -36,7 +36,7 @@ plugins {
 
 val kitGroupId = "me.saro"
 val kitArtifactId = "kit-ee"
-val kitVersion = "0.1.5.1"
+val kitVersion = "0.1.6"
 
 configure<JavaPluginExtension> {
 	sourceCompatibility = JavaVersion.VERSION_1_8
@@ -59,11 +59,11 @@ dependencies {
 
 	// lib
 	val poi = "5.0.0";
-	api("me.saro:kit:0.1.5")
+	api("me.saro:kit:$kitVersion")
 	implementation("com.jcraft:jsch:0.1.55")
 	implementation("commons-net:commons-net:3.7.2")
-	implementation("org.apache.poi:poi:${poi}")
-	implementation("org.apache.poi:poi-ooxml:${poi}")
+	implementation("org.apache.poi:poi:$poi")
+	implementation("org.apache.poi:poi-ooxml:$poi")
 
 	// test
 	testImplementation("org.junit.jupiter:junit-jupiter-engine:+")

@@ -16,23 +16,23 @@
     Koreans
     
 - [SARO KIT Enterprise Edition](https://github.com/saro-lab/kit-ee)
-  - [FTP / FTPS](https://github.com/saro-lab/kit-ee/docs/SFTP.md),
-    [SFTP](https://github.com/saro-lab/kit-ee/docs/SFTP.md)
+  - [FTP](https://github.com/saro-lab/kit-ee/blob/master/docs/FTP.md),
+    [SFTP](https://github.com/saro-lab/kit-ee/blob/master/docs/SFTP.md)
 
 # QUICK START
+
+## Gradle
+```
+compile 'me.saro:kit-ee:0.1.6'
+```
 
 ## Maven
 ``` xml
 <dependency>
   <groupId>me.saro</groupId>
   <artifactId>kit-ee</artifactId>
-  <version>0.1.5.1</version>
+  <version>0.1.6</version>
 </dependency>
-```
-
-## Gradle
-```
-compile 'me.saro:kit-ee:0.1.5.1'
 ```
 
 ---
