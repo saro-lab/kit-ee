@@ -3,6 +3,7 @@ package me.saro.kit.ee.ftp
 import com.jcraft.jsch.*
 import com.jcraft.jsch.ChannelSftp.LsEntry
 import com.jcraft.jsch.ChannelSftp.LsEntrySelector
+import me.saro.kit.legacy.ThrowableConsumer
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -26,10 +27,10 @@ class Sftp : Ftp {
         try {
             this.builder = builder
             val jSch = JSch()
-            builder.beforeSession.forEach { it(jSch) }
+            builder.beforeSession.forEach { it.accept(jSch) }
             this.session = jSch.getSession(builder.username, builder.host, builder.port)
             session.setPassword(builder.password)
-            builder.beforeConnect.forEach { it(session) }
+            builder.beforeConnect.forEach { it.accept(session) }
             session.connect()
             this.channelSftp = (session.openChannel("sftp") as ChannelSftp).apply { this.connect() }
         } catch (e: Exception) {
@@ -129,8 +130,8 @@ class Sftp : Ftp {
         internal var username: String = "",
         internal var password: ByteArray = byteArrayOf()
     ) {
-        internal val beforeSession = ArrayList<(JSch) -> Unit>()
-        internal val beforeConnect = ArrayList<(Session) -> Unit>()
+        internal val beforeSession = ArrayList<ThrowableConsumer<JSch>>()
+        internal val beforeConnect = ArrayList<ThrowableConsumer<Session>>()
 
         // default setting
         init {
@@ -140,8 +141,8 @@ class Sftp : Ftp {
         fun strictHostKeyChecking(value: String) =
             beforeConnect { it.setConfig("StrictHostKeyChecking", value) }
 
-        fun beforeSession(exec: (JSch) -> Unit) = this.apply { beforeSession.add(exec) }
-        fun beforeConnect(exec: (Session) -> Unit) = this.apply { beforeConnect.add(exec) }
+        fun beforeSession(exec: ThrowableConsumer<JSch>) = this.apply { beforeSession.add(exec) }
+        fun beforeConnect(exec: ThrowableConsumer<Session>) = this.apply { beforeConnect.add(exec) }
 
         @Throws(IOException::class)
         fun userAnonymous(): Builder = this.apply { this.username = "anonymous" }

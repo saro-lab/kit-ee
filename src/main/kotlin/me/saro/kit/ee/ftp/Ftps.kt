@@ -1,5 +1,6 @@
 package me.saro.kit.ee.ftp
 
+import me.saro.kit.legacy.ThrowableConsumer
 import org.apache.commons.net.ftp.FTPClient
 import org.apache.commons.net.ftp.FTPFile
 import org.apache.commons.net.ftp.FTPSClient
@@ -27,7 +28,7 @@ class Ftps : Ftp {
             this.ftp = builder.ftpClient
             this.secure = builder.secure
             // before connection
-            builder.beforeConnection.forEach { it(ftp) }
+            builder.beforeConnection.forEach { it.accept(ftp) }
             // connecting
             ftp.connect(builder.host, builder.port)
             // after connected
@@ -39,7 +40,7 @@ class Ftps : Ftp {
             ftp.enterLocalPassiveMode()
             ftp.isUseEPSVwithIPv4 = false
             ftp.controlKeepAliveReplyTimeout = 60000
-            builder.beforeLogin.forEach { it(ftp) }
+            builder.beforeLogin.forEach { it.accept(ftp) }
             if (!ftp.login(builder.username, builder.password)) {
                 throw IOException("login fail")
             }
@@ -156,8 +157,8 @@ class Ftps : Ftp {
         internal var username: String = "",
         internal var password: String = "",
     ) {
-        internal val beforeConnection = ArrayList<(FTPClient) -> Unit>()
-        internal val beforeLogin = ArrayList<(FTPClient) -> Unit>()
+        internal val beforeConnection = ArrayList<ThrowableConsumer<FTPClient>>()
+        internal val beforeLogin = ArrayList<ThrowableConsumer<FTPClient>>()
 
         // default setting
         init {
@@ -169,10 +170,10 @@ class Ftps : Ftp {
         fun encoding(charset: String) = beforeConnection { it.controlEncoding = charset }
 
         /** this function will execute before connection */
-        fun beforeConnection(fn: (FTPClient) -> Unit) = this.apply { beforeConnection.add(fn) }
+        fun beforeConnection(fn: ThrowableConsumer<FTPClient>) = this.apply { beforeConnection.add(fn) }
 
         /** this function will execute before login */
-        fun beforeLogin(fn: (FTPClient) -> Unit) = this.apply { beforeLogin.add(fn) }
+        fun beforeLogin(fn: ThrowableConsumer<FTPClient>) = this.apply { beforeLogin.add(fn) }
 
         @Throws(IOException::class)
         fun userAnonymous(): Builder = this.apply { this.username = "anonymous" }
