@@ -36,7 +36,7 @@ plugins {
 
 val kitGroupId = "me.saro"
 val kitArtifactId = "kit-ee"
-val kitVersion = "0.1.6"
+val kitVersion = "0.1.7"
 
 configure<JavaPluginExtension> {
 	sourceCompatibility = JavaVersion.VERSION_1_8

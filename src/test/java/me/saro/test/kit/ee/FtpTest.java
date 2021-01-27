@@ -68,5 +68,14 @@ public class FtpTest {
             assert(true);
         }
     }
+
+    public void sftpPublicKey() throws IOException {
+        try (Ftp ftp = Ftp.sftp("public-key.test.com", 22).userPublicKey("demo", "/user/.ssh/id_rsa").open()) {
+            System.out.println("sftp opened!!");
+            System.out.println("pwd: " + ftp.pwd());
+            ftp.listFiles().forEach( it -> System.out.println("file: " + it) );
+            assert(true);
+        }
+    }
 }
 

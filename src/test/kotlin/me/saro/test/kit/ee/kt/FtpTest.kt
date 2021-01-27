@@ -67,4 +67,17 @@ class FtpTest {
                 ftp.listFiles().forEach { println("file: $it") }
                 assert(true)
             }
+
+    // does not found public-key test-server
+    fun sftpPublicKey() =
+        Ftp.sftp("public-key.test.com", 22)
+            .userPublicKey("demo", "/user/.ssh/id_rsa")
+            .beforeConnect { it.timeout = 120000; }
+            .open()
+            .use { ftp ->
+                println("sftp opened!!")
+                println("pwd: ${ftp.pwd()}")
+                ftp.listFiles().forEach { println("file: $it") }
+                assert(true)
+            }
 }

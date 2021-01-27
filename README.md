@@ -23,7 +23,7 @@
 
 ## Gradle
 ```
-compile 'me.saro:kit-ee:0.1.6'
+compile 'me.saro:kit-ee:0.1.7'
 ```
 
 ## Maven
@@ -31,7 +31,7 @@ compile 'me.saro:kit-ee:0.1.6'
 <dependency>
   <groupId>me.saro</groupId>
   <artifactId>kit-ee</artifactId>
-  <version>0.1.6</version>
+  <version>0.1.7</version>
 </dependency>
 ```
 

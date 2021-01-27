@@ -41,6 +41,19 @@
       assert(true)
     }
   ```
+- public key
+  ```kotlin
+  Ftp.sftp("public-key.test.com", 22)
+    .userPublicKey("demo", "/user/.ssh/id_rsa")
+    .beforeConnect { it.timeout = 120000; }
+    .open()
+    .use { ftp ->
+        println("sftp opened!!")
+        println("pwd: ${ftp.pwd()}")
+        ftp.listFiles().forEach { println("file: $it") }
+        assert(true)
+    }
+  ```
 
 ## java example
 - simple
@@ -60,6 +73,21 @@
               .sftp("test.rebex.net", 22, "demo", "password")
               .beforeConnect { it.timeout = 120000; }
               .open()
+  ) {
+      System.out.println("sftp opened!!");
+      System.out.println("pwd: " + ftp.pwd());
+      ftp.listFiles().forEach( it -> System.out.println("file: " + it) );
+      assert(true);
+  }
+  ```
+- public key
+  ```java
+  try (
+    Ftp ftp = 
+        Ftp
+            .sftp("public-key.test.com", 22)
+            .userPublicKey("demo", "/user/.ssh/id_rsa")
+            .open()
   ) {
       System.out.println("sftp opened!!");
       System.out.println("pwd: " + ftp.pwd());

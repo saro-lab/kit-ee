@@ -29,7 +29,7 @@ class Sftp : Ftp {
             val jSch = JSch()
             builder.beforeSession.forEach { it.accept(jSch) }
             this.session = jSch.getSession(builder.username, builder.host, builder.port)
-            session.setPassword(builder.password)
+            builder.password?.run { session.setPassword(this) }
             builder.beforeConnect.forEach { it.accept(session) }
             session.connect()
             this.channelSftp = (session.openChannel("sftp") as ChannelSftp).apply { this.connect() }
@@ -128,7 +128,7 @@ class Sftp : Ftp {
         internal val host: String,
         internal val port: Int,
         internal var username: String = "",
-        internal var password: ByteArray = byteArrayOf()
+        internal var password: ByteArray? = null
     ) {
         internal val beforeSession = ArrayList<ThrowableConsumer<JSch>>()
         internal val beforeConnect = ArrayList<ThrowableConsumer<Session>>()
@@ -149,7 +149,15 @@ class Sftp : Ftp {
 
         fun user(username: String, password: String): Builder = user(username, password.toByteArray())
 
+        fun user(username: String): Builder = this.apply { this.username = username }
+
         fun user(username: String, password: ByteArray): Builder = this.apply { this.username = username; this.password = password }
+
+        fun userPublicKey(username: String, privateKey: String): Builder =
+            this.apply {
+                beforeSession { it.addIdentity(privateKey) }
+                beforeConnect { it.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password") }
+            }
 
         @Throws(IOException::class)
         fun open(): Ftp = Sftp(this)
