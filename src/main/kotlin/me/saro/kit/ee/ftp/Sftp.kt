@@ -155,6 +155,7 @@ class Sftp : Ftp {
 
         fun userPublicKey(username: String, privateKey: String): Builder =
             this.apply {
+                this.username = username
                 beforeSession { it.addIdentity(privateKey) }
                 beforeConnect { it.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password") }
             }
