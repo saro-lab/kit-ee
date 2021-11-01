@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
  */
 
 plugins {
-	val kotlinVersion = "1.4.20"
+	val kotlinVersion = "1.5.31"
 	kotlin("jvm") version kotlinVersion
 	kotlin("kapt") version kotlinVersion
 	//id("org.jetbrains.dokka") version kotlinVersion
@@ -37,7 +37,7 @@ plugins {
 val kitGroupId = "me.saro"
 val kitArtifactId = "kit-ee"
 val kitVersion = "0.1.6"
-val kitEeVersion = "0.1.7"
+val kitEeVersion = "0.1.8"
 
 configure<JavaPluginExtension> {
 	sourceCompatibility = JavaVersion.VERSION_11

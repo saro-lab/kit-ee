@@ -15,12 +15,9 @@ class ExcelStyle(
             ExcelStyle(ArrayList())
     }
 
-    constructor(): this(ArrayList())
-
-    fun apply(workbook: Workbook, cell: SXSSFCell) {
-        val style = workbook.createCellStyle()
-        styles.forEach { it.accept(style) }
-        cell.cellStyle = style
+    fun bind(cellStyle: CellStyle): CellStyle {
+        styles.forEach { it.accept(cellStyle) }
+        return cellStyle
     }
 
     fun set(style: Consumer<CellStyle>): ExcelStyle {
@@ -89,7 +86,8 @@ class ExcelStyle(
         set {
             val font = XSSFFont()
             font.fontName = name
-            font.fontHeightInPoints = point.toShort()
+            font.fontHeight = point.toShort()
+            font.bold = true
             it.setFont(font)
         }
 

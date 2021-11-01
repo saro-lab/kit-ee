@@ -17,17 +17,17 @@ public class ExcelTest {
     
     @Test
     public void test() throws Exception {
-//        File file = new File("C:\\Users\\SARO\\Desktop\\11\\abc.xlsx");
+//        File file = new File("C:\\Users\\SARO\\Desktop\\abc.xlsx");
 //
 //        var style = ExcelStyle.create()
 //                .setAlignment(HorizontalAlignment.CENTER)
 //                .setVerticalAlignment(VerticalAlignment.CENTER)
 //                .setBorderStyle(Direction.ALL, BorderStyle.THIN)
-//                .setFont("맑은 고딕", 10)
+//                .setFont("Arial", 20)
 //                .setWrapText(true);
 //
 //        Excel.create()
-//                .newSheet("시트1")
+//                .createSheet("시트1")
 //                .move(0, 0)
 //                .setValues(Lists.asList("1", "2", "3"), style)
 //                .nextRow()

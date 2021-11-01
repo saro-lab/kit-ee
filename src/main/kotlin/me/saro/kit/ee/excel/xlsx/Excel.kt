@@ -14,11 +14,10 @@ import java.util.*
 
 class Excel(
     private val workbook: SXSSFWorkbook,
-) {
-    private var sheet: SXSSFSheet? = null
-    private var row: SXSSFRow? = null
+    private var sheet: SXSSFSheet? = null,
+    private var row: SXSSFRow? = null,
     private var cell: SXSSFCell? = null
-
+) {
     companion object {
         @JvmStatic
         fun create(fileInputStream: FileInputStream): Excel =
@@ -29,11 +28,7 @@ class Excel(
             Excel(SXSSFWorkbook())
     }
 
-    constructor(fileInputStream: FileInputStream): this(SXSSFWorkbook(XSSFWorkbook(fileInputStream)))
-
-    constructor(): this(SXSSFWorkbook())
-
-    fun newSheet(sheetName: String): Excel {
+    fun createSheet(sheetName: String): Excel {
         sheet = workbook.createSheet(sheetName)
         return this
     }
@@ -43,17 +38,28 @@ class Excel(
         return this
     }
 
-    fun moveRow(index: Int): Excel {
-        if (sheet != null) {
-            if (row == null || row!!.rowNum != index) {
-                row = sheet!!.getRow(index)
-                    ?: sheet!!.createRow(index)
-            }
+    fun getSheetAt(index: Int): Excel {
+        sheet = workbook.getSheetAt(index)
+        return this
+    }
+
+    fun executeWithRevertCursor(execute: Runnable): Excel {
+        val tRow = row
+        val tCell = cell
+        execute.run()
+        row = tRow
+        cell = tCell
+        return this
+    }
+
+    fun moveRow(rowIndex: Int): Excel {
+        ExcelCheck.sheet(sheet)
+        if (row == null || row!!.rowNum != rowIndex) {
+            row = sheet!!.getRow(rowIndex)
+                ?: sheet!!.createRow(rowIndex)
             if (cell != null) {
-                cell = row!!.createCell(cell!!.columnIndex)
+                moveCell(cell!!.columnIndex)
             }
-        } else {
-            throw IllegalStateException("sheet has not created/selected")
         }
         return this
     }
@@ -61,18 +67,13 @@ class Excel(
     fun nextRow(): Excel =
         moveRow((row?.rowNum ?: -1) + 1)
 
-    fun moveCell(index: Int): Excel {
-        if (sheet != null) {
-            if (row == null) {
-                moveRow(0)
-            }
-            if (cell == null || cell!!.columnIndex != index) {
-                cell = row!!.getCell(index)
-                    ?: row!!.createCell(index)
-            }
-        } else {
-            throw IllegalStateException("sheet has not created/selected")
+    fun moveCell(columnIndex: Int): Excel {
+        ExcelCheck.sheet(sheet)
+        if (row == null) {
+            moveRow(0)
         }
+        cell = row!!.getCell(columnIndex)
+            ?: row!!.createCell(columnIndex)
         return this
     }
 
@@ -83,103 +84,93 @@ class Excel(
         moveRow(rowIndex).moveCell(columnIndex)
 
     fun setValue(value: Any?): Excel {
-        if (cell != null) {
-            if (value != null) {
-                when {
-                    (value is Number) -> cell!!.setCellValue(value.toDouble())
-                    (value is Boolean) -> cell!!.setCellValue(value)
-                    (value is RichTextString) -> cell!!.setCellValue(value)
-                    (value is Date) -> cell!!.setCellValue(value)
-                    (value is Calendar) -> cell!!.setCellValue(value)
-                    else -> cell!!.setCellValue(value.toString())
-                }
-            } else {
-                cell!!.setCellValue("")
+        ExcelCheck.cell(cell)
+        if (value != null) {
+            when {
+                (value is Number) -> cell!!.setCellValue(value.toDouble())
+                (value is Boolean) -> cell!!.setCellValue(value)
+                (value is RichTextString) -> cell!!.setCellValue(value)
+                (value is Date) -> cell!!.setCellValue(value)
+                (value is Calendar) -> cell!!.setCellValue(value)
+                else -> cell!!.setCellValue(value.toString())
             }
         } else {
-            throw IllegalStateException("cell has not created/selected")
+            cell!!.setCellValue("")
         }
         return this
     }
 
     fun setStyle(excelStyle: ExcelStyle): Excel {
-        if (cell != null) {
-            excelStyle.apply(workbook, cell!!)
-        } else {
-            throw IllegalStateException("cell has not created/selected")
-        }
+        ExcelCheck.cell(cell)
+        cell!!.cellStyle = excelStyle.bind(workbook.createCellStyle())
         return this
     }
 
     fun setStyleRange(excelStyle: ExcelStyle, toX: Int, toY: Int): Excel {
-        if (cell != null) {
-            val cell = this.cell!!
-            val row = this.row
-            for (x in 0 until toX) {
-                for (y in 0 until toY) {
-                    move(cell.rowIndex + y, cell.columnIndex)
-                    setStyle(excelStyle)
+        ExcelCheck.cell(cell)
+        return executeWithRevertCursor {
+            val sRow = cell!!.rowIndex
+            val sColumn = cell!!.columnIndex
+            val style = excelStyle.bind(workbook.createCellStyle())
+            for (y in 0 until toY) {
+                moveRow(sRow + y)
+                for (x in 0 until toX) {
+                    moveCell(sColumn + x)
+                    cell!!.cellStyle = style
                 }
             }
-            this.cell = cell
-            this.row = row
-        } else {
-            throw IllegalStateException("cell has not created/selected")
         }
-        return this
     }
 
     fun setValues(list: List<Any?>, excelStyle: ExcelStyle?): Excel {
-        val cell = this.cell
-        val row = this.row
-        for (i in list.indices) {
-            if (i != 0) {
-                nextCell()
-            }
-            setValue(list[i])
-            if (excelStyle != null) {
-                setStyle(excelStyle)
+        return executeWithRevertCursor {
+            val style = excelStyle?.bind(workbook.createCellStyle())
+            for (x in list.indices) {
+                if (x != 0) {
+                    nextCell()
+                }
+                setValue(list[x])
+                if (style != null) {
+                    cell!!.cellStyle = style
+                }
             }
         }
-        this.cell = cell
-        this.row = row
-        return this
     }
 
     fun setValues(list: List<Any?>): Excel =
         setValues(list, null)
 
     fun setValuesVertical(list: List<Any?>, excelStyle: ExcelStyle?): Excel {
-        val cell = this.cell
-        val row = this.row
-        for (i in list.indices) {
-            if (i != 0) {
-                nextRow()
-            }
-            setValue(list[i])
-            if (excelStyle != null) {
-                setStyle(excelStyle)
+        return executeWithRevertCursor {
+            val style = excelStyle?.bind(workbook.createCellStyle())
+            for (y in list.indices) {
+                if (y != 0) {
+                    nextRow()
+                }
+                setValue(list[y])
+                if (style != null) {
+                    cell!!.cellStyle = style
+                }
             }
         }
-        this.cell = cell
-        this.row = row
-        return this
     }
 
+    fun setValuesVertical(list: List<Any?>): Excel =
+        setValuesVertical(list, null)
+
     fun setWidth(width: Int, columnIndex: Int): Excel {
+        ExcelCheck.sheet(sheet)
         sheet!!.setColumnWidth(columnIndex, width)
         return this
     }
 
     fun setWidths(width: Int, columnIndex: Int, toX: Int): Excel {
+        ExcelCheck.sheet(sheet)
         for (i in 0 until toX) {
-            sheet!!.setColumnWidth(columnIndex, width + i)
+            sheet!!.setColumnWidth(columnIndex + i, width)
         }
         return this
     }
-
-    fun setValuesVertical(list: List<Any?>): Excel =
-        setValuesVertical(list, null)
 
     fun save(outputStream: OutputStream) {
         workbook.write(outputStream)
