@@ -11,17 +11,17 @@ import org.junit.jupiter.api.Test
 class FtpTest {
     @Test
     fun test() {
-        println("+++++++ FTP +++++++")
-        ftp()
-
-        println("+++++++ FTPS (explicit mode) +++++++")
-        ftpsExplicitMode()
-
-        println("+++++++ FTPS (implicit mode) +++++++")
-        ftpsImplicitMode()
-
-        println("+++++++ S-FTP +++++++")
-        sftp()
+//        println("+++++++ FTP +++++++")
+//        ftp()
+//
+//        println("+++++++ FTPS (explicit mode) +++++++")
+//        ftpsExplicitMode()
+//
+//        println("+++++++ FTPS (implicit mode) +++++++")
+//        ftpsImplicitMode()
+//
+//        println("+++++++ S-FTP +++++++")
+//        sftp()
     }
 
     fun ftp() =

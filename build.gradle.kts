@@ -40,8 +40,8 @@ val kitVersion = "0.1.6"
 val kitEeVersion = "0.1.7"
 
 configure<JavaPluginExtension> {
-	sourceCompatibility = JavaVersion.VERSION_1_8
-	targetCompatibility = JavaVersion.VERSION_1_8
+	sourceCompatibility = JavaVersion.VERSION_11
+	targetCompatibility = JavaVersion.VERSION_11
 }
 
 repositories {
@@ -59,10 +59,10 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 
 	// lib
-	val poi = "5.0.0";
+	val poi = "5.0.0"
 	api("me.saro:kit:$kitVersion")
 	implementation("com.jcraft:jsch:0.1.55")
-	implementation("commons-net:commons-net:3.7.2")
+	implementation("commons-net:commons-net:3.8.0")
 	implementation("org.apache.poi:poi:$poi")
 	implementation("org.apache.poi:poi-ooxml:$poi")
 
@@ -123,12 +123,6 @@ signing {
 	sign(publishing.publications["maven"])
 }
 
-//tasks.register<Jar>("dokkaJar") {
-//	archiveClassifier.set("javadoc")
-//	dependsOn("dokkaJavadoc")
-//	from("$buildDir/dokka/javadoc/")
-//}
-
 tasks.withType<Javadoc>().configureEach {
 	options {
 		this as StandardJavadocDocletOptions
@@ -139,7 +133,7 @@ tasks.withType<Javadoc>().configureEach {
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict")
-		jvmTarget = "1.8"
+		jvmTarget = "11"
 	}
 }
 

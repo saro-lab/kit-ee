@@ -15,17 +15,17 @@ public class FtpTest {
 
     @Test
     public void test() throws Exception {
-        System.out.println("+++++++ FTP +++++++");
-        ftp();
-
-        System.out.println("+++++++ FTPS (explicit mode) +++++++");
-        ftpsExplicitMode();
-
-        System.out.println("+++++++ FTPS (implicit mode) +++++++");
-        ftpsImplicitMode();
-
-        System.out.println("+++++++ S-FTP +++++++");
-        sftp();
+//        System.out.println("+++++++ FTP +++++++");
+//        ftp();
+//
+//        System.out.println("+++++++ FTPS (explicit mode) +++++++");
+//        ftpsExplicitMode();
+//
+//        System.out.println("+++++++ FTPS (implicit mode) +++++++");
+//        ftpsImplicitMode();
+//
+//        System.out.println("+++++++ S-FTP +++++++");
+//        sftp();
     }
 
     public void ftp() throws IOException {

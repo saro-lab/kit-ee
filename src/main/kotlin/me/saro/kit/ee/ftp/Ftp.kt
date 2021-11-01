@@ -1,11 +1,10 @@
 package me.saro.kit.ee.ftp
 
-import java.io.Closeable
-import kotlin.Throws
-import java.io.IOException
-import java.io.File
 import org.apache.commons.net.ftp.FTPClient
 import org.apache.commons.net.ftp.FTPSClient
+import java.io.Closeable
+import java.io.File
+import java.io.IOException
 import java.util.function.Predicate
 
 /**
