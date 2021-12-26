@@ -63,8 +63,6 @@ dependencies {
 	api("me.saro:kit:$kitVersion")
 	implementation("com.jcraft:jsch:0.1.55")
 	implementation("commons-net:commons-net:3.8.0")
-	implementation("org.apache.poi:poi:$poi")
-	implementation("org.apache.poi:poi-ooxml:$poi")
 
 	// test
 	testImplementation("org.junit.jupiter:junit-jupiter-engine:+")
