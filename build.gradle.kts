@@ -1,8 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 /**
- * SARO JWT
- *
  * + publish
  * 1. gradle publish
  * 2. https://oss.sonatype.org/
