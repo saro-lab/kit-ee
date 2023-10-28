@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 /**
- * SARO KIT-EE
+ * SARO JWT
  *
  * + publish
  * 1. gradle publish
@@ -15,21 +15,27 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
  *    - ex windows path) C:/Users/<USER_NAME>/.gradle/gradle.properties
  *    sonatype.username=<username>
  *    sonatype.password=<password>
- *    signing.keyId=<last 16 chars in key>
+ *    signing.keyId=<last 8/16 chars in key>
  *    signing.password=<secret>
  *    signing.secretKeyRingFile=<path of secring.gpg>
  *
+ * + you can use "User Token" instead of id & password.
+ *     - https://oss.sonatype.org -> profile -> User Token
+ *
  * @See
- * https://github.com/saro-lab/kit-ee
+ * https://github.com/saro-lab/jwt
  * https://docs.gradle.org/current/userguide/publishing_maven.html
  * https://docs.gradle.org/current/userguide/signing_plugin.html#signing_plugin
+ * windows -> pgp4win
+ * gpg --gen-key
+ * gpg --list-keys --keyid-format short
+ * gpg --export-secret-keys -o secring.gpg
  */
 
 plugins {
-	val kotlinVersion = "1.5.31"
-	kotlin("jvm") version kotlinVersion
-	kotlin("kapt") version kotlinVersion
-	//id("org.jetbrains.dokka") version kotlinVersion
+	val kotlinVersion = "1.9.20-RC2"
+	id("org.jetbrains.kotlin.jvm") version kotlinVersion
+	id("org.jetbrains.kotlin.kapt") version kotlinVersion
 	signing
 	`maven-publish`
 }
@@ -40,8 +46,8 @@ val kitVersion = "0.1.6"
 val kitEeVersion = "0.1.8"
 
 configure<JavaPluginExtension> {
-	sourceCompatibility = JavaVersion.VERSION_11
-	targetCompatibility = JavaVersion.VERSION_11
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 repositories {
@@ -54,10 +60,6 @@ java {
 }
 
 dependencies {
-	// koltin
-	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
-
 	// lib
 	val poi = "5.0.0"
 	api("me.saro:kit:$kitVersion")
@@ -131,7 +133,7 @@ tasks.withType<Javadoc>().configureEach {
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict")
-		jvmTarget = "11"
+		jvmTarget = "21"
 	}
 }
 
