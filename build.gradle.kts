@@ -45,6 +45,7 @@ val kitArtifactId = "kit-ee"
 val kitVersion = "0.1.6"
 val kitEeVersion = "0.1.8"
 
+
 configure<JavaPluginExtension> {
 	sourceCompatibility = JavaVersion.VERSION_21
 	targetCompatibility = JavaVersion.VERSION_21
@@ -60,14 +61,21 @@ java {
 }
 
 dependencies {
-	// lib
-	val poi = "5.0.0"
+
+	// jackson
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.3")
+
 	api("me.saro:kit:$kitVersion")
 	implementation("com.jcraft:jsch:0.1.55")
 	implementation("commons-net:commons-net:3.8.0")
 
 	// test
+	testImplementation("org.junit.jupiter:junit-jupiter-api:+")
 	testImplementation("org.junit.jupiter:junit-jupiter-engine:+")
+}
+
+tasks.withType<Test> {
+	useJUnitPlatform()
 }
 
 publishing {
@@ -76,15 +84,19 @@ publishing {
 
 			groupId = kitGroupId
 			artifactId = kitArtifactId
-			version = kitEeVersion
+			version = kitVersion
 
 			from(components["java"])
 
 			repositories {
 				maven {
 					credentials {
-						username = project.property("sonatype.username").toString()
-						password = project.property("sonatype.password").toString()
+						try {
+							username = project.property("sonatype.username").toString()
+							password = project.property("sonatype.password").toString()
+						} catch (e: Exception) {
+							println("warn: " + e.message)
+						}
 					}
 					val releasesRepoUrl = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
 					val snapshotsRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
@@ -137,6 +149,11 @@ tasks.withType<KotlinCompile> {
 	}
 }
 
-tasks.withType<Test> {
-	useJUnitPlatform()
-}
+
+
+
+
+
+
+
+
